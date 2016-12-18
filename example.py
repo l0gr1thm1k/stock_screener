@@ -204,10 +204,10 @@ def compound_annual_growth_rate(ticker, n=5):
 
 def print_summary(stock):
     print(stock.name)
-    print("    Five consecutive years of dividend increases: {}".format(str(stock.continuous_dividend_growth)))
+    print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_growth)))
     print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
     # print("    Median of 1-year, 3-year, and 5-year compound annual growth rates is at least 6%")
-    print("    Media of dividend 5-year CAGR is at lest 6%: {}%")
+    print("    Median of dividend 5-year CAGR is at lest 6%: {}%")
     print("%" * 80)
 
 
