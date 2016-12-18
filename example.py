@@ -2,16 +2,18 @@
 
 from datetime import datetime, timedelta
 from matplotlib.finance import quotes_historical_yahoo_ohlc as example
-import matplotlib.finance as finance
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import pandas as pd
+import json
 import re
+import requests
 import sys
 
 
 class Stock:
-
+    """
+    @desc   - a basic class to hold stock properties as objects.
+    """
     def __init__(self, ticker):
         self.ticker = ticker
 
@@ -51,59 +53,70 @@ def make_base_urls(soup, url):
     return urls
 
 
-def get_metrics(ticker):
+def get_statistics(ticker, periods=5):
+    """
+    @desc   - compile information about a stock from an online source.
+              the stock data gathered can then be used to calculate various
+              financial ratios
+    @param  - ticker: the stock's ticker code
+    @param  - periods: number of years to gather return data for
+    @return - stock: a Stock class object containing many statistics
+    """
+    # make a soup object from yahoo finance page
     ticker = ticker.upper().strip()
     stock = Stock(ticker)
     url = "http://finance.yahoo.com/quote/{}".format(ticker)
     soup = make_soup(url)
+
+    # get base urls with links to other information type pages
     urls = make_base_urls(soup, url)
-
-    stats = make_soup(urls["key-statistics"])
-
-    # for link in stats.find_all("div", attrs={"data-test": "qsp-statistics"}): # class_=re.compile("^table")
-    for link in stats.find_all("root"):
-        print(link)
     stock.urls = urls
+    # you will get historical data here
+
+    # gather other stats from this pre-created form
+    params = {"formatted": "true",
+              "crumb": "AKV/cl0TOgz",
+              "lang": "en-US",
+              "region": "US",
+              "modules": "defaultKeyStatistics,financialData,calendarEvents",
+              "corsDomain": "finance.yahoo.com"}
+    url = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/{}"
+    r = requests.get(url.format(ticker), params=params)
+    data = r.json()["quoteSummary"]["result"][0]["defaultKeyStatistics"]  # ["financialData"]
+    for key in sorted(data.keys()):
+        print(key, data[key])
+        #if type(data[key]) == dict and "raw" in data[key]:
+        #    stock.key =
+
     return stock
 
 
-def compound_annual_growth_rate(ticker, n=5):
+def get_historical_price_data(ticker, n):
+    """
+    @desc   - get historical high, low and close prices for a stock in a window of years.
+              End date to gather data is always today.
+    @param  - ticker: the stock whose data will be gathered
+    @param  - n: an integer representing the number of years to gather data for
+    @return - returns: list of daily returns in the format
+
+                  [date, open, high, low, close, adj_close]
+    """
     now = datetime.today() - timedelta(days=1)
     d1 = (now.year-n, now.month, now.day)
     d2 = (now.year, now.month, now.day)
+    returns = example(ticker.upper(), d1, d2)
+    return returns
 
-    result = example(ticker.upper(), d1, d2)
+
+def compound_annual_growth_rate(ticker, n=5):
+    result = get_historical_price_data(ticker, n)
     then_close = result[0][4]
     today_close = result[-1][4]
     cagr = ((today_close / then_close) ** (1/n)) - 1
     return cagr
 
 
-def get_quote(ticker, n=5):
-    ticker = ticker.upper().strip()
-    now = datetime.today() - timedelta(days=1)
-    d1 = (now.year-n, now.month, now.day)
-    d2 = (now.year, now.month, now.day)
-    fh = finance.fetch_historical_yahoo(ticker, d1, d2)
-    # returns a file obj that has fields Date, Open, High, Low, Close, Volume, Adj Close
-    return fh
-
-
 if __name__ == "__main__":
-    """
-    tickers = sorted(["KO", "T", "CSCO", "BA", "MSFT", "AAPL", "NTT", "CVX", "INTC", "PG", "PNNT", "ABBV", "AFL",
-                       "O", "TGT", "BBL", "CB", "CMI", "D", "DIS", "ES", "EXG", "F", "GD", "GILD", "GPS", "HP", "IBM",
-                       "JNJ", "KMB", "LMT", "MAIN", "MCD", "MMM", "MO", "NEA", "NKE", "NOC", "OHI", "PFE", "QCOM", "RAI",
-                       "RTN", "STAG", "TROW", "TRV", "UNP", "UPS", "VLO", "WBA", "WFC", "WMT", "XOM"])
-    # large_caps = sorted(["CHL", "PG", "IBM", "KO", "SNY", "T", "TM", "TSM", "UL"])
-     for ticker in tickers:
-        rate = compound_annual_growth_rate(ticker)
-        print("The 5-year compound annual growth rate of {ticker} is {:.2f}%".format(rate*100, ticker=ticker))
-    """
-    ticker = sys.argv[1].upper()
-    periods = int(sys.argv[2])
-    # rate = compound_annual_growth_rate(ticker, periods)
-    # print("The {}-year compound annual growth rate of {ticker} is {:.2f}%".format(periods, rate * 100, ticker=ticker))
-    result = get_metrics(ticker)
-    # for key in result.urls:
-    #   print(key, result.urls[key])
+    ticker = sys.argv[1].upper().strip()
+    result = get_statistics(ticker)
+
