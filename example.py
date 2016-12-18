@@ -8,6 +8,7 @@ import json
 import re
 import requests
 import sys
+import json
 
 
 class Stock:
@@ -71,6 +72,9 @@ def get_statistics(ticker, periods=5):
     # get base urls with links to other information type pages
     urls = make_base_urls(soup, url)
     stock.urls = urls
+    stock.annual_dividend = float(re.findall('"dividendRate":{"raw":(.*?),', soup.get_text())[0])
+
+    # print(re.findall(".{100}1\.96", soup.get_text()))
     # you will get historical data here
 
     # gather other stats from this pre-created form
@@ -82,12 +86,25 @@ def get_statistics(ticker, periods=5):
               "corsDomain": "finance.yahoo.com"}
     url = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/{}"
     r = requests.get(url.format(ticker), params=params)
-    data = r.json()["quoteSummary"]["result"][0]["defaultKeyStatistics"]  # ["financialData"]
-    for key in sorted(data.keys()):
-        print(key, data[key])
-        #if type(data[key]) == dict and "raw" in data[key]:
-        #    stock.key =
+    calendar_events = r.json()["quoteSummary"]["result"][0]["calendarEvents"]
+    default_key_statistics = r.json()["quoteSummary"]["result"][0]["defaultKeyStatistics"]
+    financial_data = r.json()["quoteSummary"]["result"][0]["financialData"]
 
+    stock.book_value = default_key_statistics["bookValue"]["raw"]
+    stock.price_to_book = default_key_statistics["priceToBook"]["raw"]
+    stock.beta = default_key_statistics["beta"]["raw"]
+    stock.forward_eps = default_key_statistics["forwardEps"]["raw"]
+    stock.trailing_eps = default_key_statistics["trailingEps"]["raw"]
+    stock.peg_ratio = default_key_statistics["pegRatio"]["raw"]
+    stock.current_price = financial_data["currentPrice"]["raw"]
+    stock.debt_to_equity = financial_data["debtToEquity"]["raw"]
+    stock.free_cash_flow = financial_data["freeCashflow"]["raw"]
+    stock.operating_cash_flow = financial_data["operatingCashflow"]["raw"]
+    stock.dividend_yield = float(stock.annual_dividend / stock.current_price)
+    stock.compound_annual_growth_rate = compound_annual_growth_rate(stock.ticker, periods)
+    stock.periods = periods
+    #for key in sorted(default_key_statistics.keys()):
+    #    print(key, default_key_statistics[key])
     return stock
 
 
@@ -119,4 +136,6 @@ def compound_annual_growth_rate(ticker, n=5):
 if __name__ == "__main__":
     ticker = sys.argv[1].upper().strip()
     result = get_statistics(ticker)
-
+    print("the annual dividend for {} is ${} with a yield of {:.2f}%" .format(ticker, result.annual_dividend,
+                                                                                  result.dividend_yield*100))
+    print("The {}-year compound annual growth rate for {} is {:.2f}%".format(result.periods, result.ticker, result.compound_annual_growth_rate*100))
