@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
-
 from matplotlib.finance import *
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import operator
 import re
 import requests
 import sys
@@ -14,8 +14,8 @@ class Stock:
     """
     @desc   - a basic class to hold stock properties as objects.
     """
-    def __init__(self, ticker):
-        self.ticker = ticker
+    def __init__(self, ticker_symbol):
+        self.ticker = ticker_symbol
 
 
 def make_soup(url):
@@ -53,24 +53,25 @@ def make_base_urls(soup, url):
     return urls
 
 
-def get_statistics(ticker, periods=5):
+def get_statistics(ticker_symbol, time_periods=5):
     """
     @desc   - compile information about a stock from an online source.
               the stock data gathered can then be used to calculate various
               financial ratios
-    @param  - ticker: the stock's ticker code
-    @param  - periods: number of years to gather return data for
+    @param  - ticker_symbol: the stock's ticker code
+    @param  - time_periods: number of years to gather return data for
     @return - stock: a Stock class object containing many statistics
     """
     # make a soup object from yahoo finance page
-    ticker = ticker.upper().strip()
-    stock = Stock(ticker)
-    url = "http://finance.yahoo.com/quote/{}".format(ticker)
+    ticker_symbol = ticker_symbol.upper().strip()
+    stock = Stock(ticker_symbol)
+    url = "http://finance.yahoo.com/quote/{}".format(ticker_symbol)
     soup = make_soup(url)
 
     # get base urls with links to other information type pages
     urls = make_base_urls(soup, url)
     stock.urls = urls
+    profile = make_soup(stock.urls["profile"])
 
     # print(re.findall(".{100}1\.96", soup.get_text()))
     # you will get historical data here
@@ -83,7 +84,7 @@ def get_statistics(ticker, periods=5):
               "modules": "defaultKeyStatistics,financialData,calendarEvents",
               "corsDomain": "finance.yahoo.com"}
     url = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/{}"
-    r = requests.get(url.format(ticker), params=params)
+    r = requests.get(url.format(ticker_symbol), params=params)
     calendar_events = r.json()["quoteSummary"]["result"][0]["calendarEvents"]
     default_key_statistics = r.json()["quoteSummary"]["result"][0]["defaultKeyStatistics"]
     financial_data = r.json()["quoteSummary"]["result"][0]["financialData"]
@@ -104,11 +105,17 @@ def get_statistics(ticker, periods=5):
     except IndexError:
         stock.annual_dividend = 0.0
         stock.dividend_yield = 0.0
-    stock.compound_annual_growth_rate = compound_annual_growth_rate(stock.ticker, periods)
-    stock.dividend_history = get_dividend_history(stock.ticker, periods)
-    stock.periods = periods
+    stock.compound_annual_growth_rate = compound_annual_growth_rate(stock.ticker, time_periods)
+    stock.dividend_history = get_dividend_history(stock.ticker, time_periods)
+    stock.periods = time_periods
+    stock.name = re.findall("See the company profile for (.*?)\(%s\)" % ticker_symbol, profile.get_text())[0].strip()
+    stock.name = format_company_name(stock.name)
     stock.continuous_dividend_growth = continuous_dividend_increases(stock)
     return stock
+
+
+def calc_median_dividend_CAGR(stock):
+    yields = calculate_dividend_increase(stock)
 
 
 def calculate_dividend_increase(stock):
@@ -178,6 +185,15 @@ def get_historical_price_data(ticker, n):
     return returns
 
 
+def format_company_name(name):
+    if "(The)" in name:
+        name = re.sub("\s*\(The\).+", "", name)
+        name = "The " + name
+    if "Commo" in name:
+        name = re.sub("\s*Commo.+", "", name)
+    return name
+
+
 def compound_annual_growth_rate(ticker, n=5):
     result = get_historical_price_data(ticker, n)
     then_close = result[0][4]
@@ -186,30 +202,36 @@ def compound_annual_growth_rate(ticker, n=5):
     return cagr
 
 
+def print_summary(stock):
+    print(stock.name)
+    print("    Five consecutive years of dividend increases: {}".format(str(stock.continuous_dividend_growth)))
+    print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
+    # print("    Median of 1-year, 3-year, and 5-year compound annual growth rates is at least 6%")
+    print("    Media of dividend 5-year CAGR is at lest 6%: {}%")
+    print("%" * 80)
+
+
 if __name__ == "__main__":
     ticker = sys.argv[1].upper().strip()
     periods = int(sys.argv[2])
-    result = get_statistics(ticker, periods)
-    #print("{} has paid a continuously growing dividend over the last {} years: {}".format(ticker, periods, str(result.continuous_dividend_growth)))
-    #print("the annual dividend for {} is ${} with a yield of {:.2f}%" .format(ticker, result.annual_dividend,
-     #                                                                             result.dividend_yield*100))
-    #print("The {}-year compound annual growth rate for {} is {:.2f}%".format(result.periods, result.ticker, result.compound_annual_growth_rate*100))
-
-    tickers = sorted(["KO", "T", "CSCO", "BA", "MSFT", "AAPL", "NTT", "CVX", "INTC", "PG", "PNNT", "ABBV", "AFL",
-                       "O", "TGT", "BBL", "CB", "CMI", "D", "DIS", "ES", "EXG", "F", "GD", "GILD", "GPS", "HP", "IBM",
-                       "JNJ", "KMB", "LMT", "MAIN", "MCD", "MMM", "MO", "NEA", "NKE", "NOC", "OHI", "PFE", "QCOM",
-                       "RAI",
-                       "RTN", "STAG", "TROW", "TRV", "UNP", "UPS", "VLO", "WBA", "WFC", "WMT", "XOM"])
-    # large_caps = sorted(["CHL", "PG", "IBM", "KO", "SNY", "T", "TM", "TSM", "UL"])
-    for ticker in tickers:
+    if ticker == "DIVGROW":
+        tickers = sorted(["KO", "T", "CSCO", "BA", "MSFT", "AAPL", "NTT", "CVX", "INTC", "PG", "PNNT", "ABBV", "AFL",
+                          "O", "TGT", "BBL", "CB", "CMI", "D", "DIS", "ES", "EXG", "F", "GD", "GILD", "GPS", "HP",
+                          "IBM", "JNJ", "KMB", "LMT", "MAIN", "MCD", "MMM", "MO", "NEA", "NKE", "NOC", "OHI", "PFE",
+                          "QCOM", "RAI", "RTN", "STAG", "TROW", "TRV", "UNP", "UPS", "VLO", "WBA", "WFC", "WMT", "XOM"])
+        # large_caps = sorted(["CHL", "PG", "IBM", "KO", "SNY", "T", "TM", "TSM", "UL"])
+        test = ["KO", "T"]
+        results = []
+        for ticker in tickers:
+            try:
+                result = get_statistics(ticker, periods)
+                if result.continuous_dividend_growth is True and result.dividend_yield > 0.02: #  and result.compound_annual_growth_rate + result.dividend_yield > 0.12:
+                    results.append(result)
+            except:
+                pass
+        results.sort(key=operator.attrgetter("dividend_yield"))
+        for result in reversed(results):
+            print_summary(result)
+    else:
         result = get_statistics(ticker, periods)
-        if result.continuous_dividend_growth == True and result.dividend_yield > 0.02 and result.compound_annual_growth_rate + result.dividend_yield > 0.12:
-            print("{} has paid a continuously growing dividend over the last {} years: {}".format(ticker, periods, str(
-            result.continuous_dividend_growth)))
-            print("the annual dividend for {} is ${} with a yield of {:.2f}%".format(ticker, result.annual_dividend,
-                                                                                 result.dividend_yield * 100))
-            print("The {}-year compound annual growth rate for {} is {:.2f}%".format(result.periods, result.ticker,
-                                                                                 result.compound_annual_growth_rate * 100))
-            print("%" * 80)
-    # yields = calculate_dividend_increase(result)
-    # print(yields)
+        print_summary(result)
