@@ -72,7 +72,7 @@ def get_statistics(ticker_symbol, time_periods=5):
     urls = make_base_urls(soup, url)
     stock.urls = urls
     profile = make_soup(stock.urls["profile"])
-
+    statistics = make_soup(stock.urls["key-statistics"])
     # print(re.findall(".{100}1\.96", soup.get_text()))
     # you will get historical data here
 
@@ -102,20 +102,43 @@ def get_statistics(ticker_symbol, time_periods=5):
     try:
         stock.annual_dividend = float(re.findall('"dividendRate":{"raw":(.*?),', soup.get_text())[0])
         stock.dividend_yield = float(stock.annual_dividend / stock.current_price)
+        stock.dividend_payout_ratio = float(re.findall('payoutRatio".*?(\d*\.?\d+)',  statistics.get_text())[0])
     except IndexError:
         stock.annual_dividend = 0.0
         stock.dividend_yield = 0.0
+        stock.dividend_payout_ratio = 0.0
+    stock.price_to_earnings = float(re.findall("PE Ratio.*?TTM.*?(\d+\.\d+)", soup.get_text())[0])
     stock.compound_annual_growth_rate = compound_annual_growth_rate(stock.ticker, time_periods)
     stock.dividend_history = get_dividend_history(stock.ticker, time_periods)
     stock.periods = time_periods
     stock.name = re.findall("See the company profile for (.*?)\(%s\)" % ticker_symbol, profile.get_text())[0].strip()
     stock.name = format_company_name(stock.name)
     stock.continuous_dividend_growth = continuous_dividend_increases(stock)
+    stock.dividend_cagr_rates = calc_median_dividend_cagr(stock)
     return stock
 
 
-def calc_median_dividend_CAGR(stock):
+def calc_median_dividend_cagr(stock):
     yields = calculate_dividend_increase(stock)
+    current_yield = stock.annual_dividend / 4  # will have to fix this later
+    compound_annual_growth_rates = []
+    for index, old_yield in enumerate(yields):
+        rate = ((current_yield / old_yield) ** (1/ (index+1) )) - 1
+        compound_annual_growth_rates.append(rate)
+    return median(compound_annual_growth_rates)
+
+
+def median(x):
+    try:
+        if len(x) % 2 != 0:
+            return sorted(x)[int(len(x)/2)]
+        else:
+            mid_1 = len(x) // 2
+            mid_2 = mid_1 + 1
+            mid_avg = (sorted(x)[mid_1] + sorted(x)[mid_2])/2
+            return mid_avg
+    except IndexError:
+        return 0.0
 
 
 def calculate_dividend_increase(stock):
@@ -203,11 +226,13 @@ def compound_annual_growth_rate(ticker, n=5):
 
 
 def print_summary(stock):
-    print(stock.name)
+    print(stock.name.strip() + " (" + stock.ticker + ")")
     print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_growth)))
     print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
     # print("    Median of 1-year, 3-year, and 5-year compound annual growth rates is at least 6%")
-    print("    Median of dividend 5-year CAGR is at lest 6%: {}%")
+    print("    Median of dividend 5-year compound annual growth is at least 6%: {:.2f}%".format(stock.dividend_cagr_rates*100))
+    print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
+    print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
     print("%" * 80)
 
 
@@ -216,18 +241,19 @@ if __name__ == "__main__":
     periods = int(sys.argv[2])
     if ticker == "DIVGROW":
         tickers = sorted(["KO", "T", "CSCO", "BA", "MSFT", "AAPL", "NTT", "CVX", "INTC", "PG", "PNNT", "ABBV", "AFL",
-                          "O", "TGT", "BBL", "CB", "CMI", "D", "DIS", "ES", "EXG", "F", "GD", "GILD", "GPS", "HP",
-                          "IBM", "JNJ", "KMB", "LMT", "MAIN", "MCD", "MMM", "MO", "NEA", "NKE", "NOC", "OHI", "PFE",
+                          "O", "TGT", "BBL", "CB", "CMI", "D", "DIS", "ES", "F", "GD", "GILD", "GPS", "HP",
+                          "IBM", "JNJ", "KMB", "LMT", "MAIN", "MCD", "MMM", "MO", "NKE", "NOC", "OHI", "PFE",
                           "QCOM", "RAI", "RTN", "STAG", "TROW", "TRV", "UNP", "UPS", "VLO", "WBA", "WFC", "WMT", "XOM"])
-        # large_caps = sorted(["CHL", "PG", "IBM", "KO", "SNY", "T", "TM", "TSM", "UL"])
+        # large_caps = sorted(["CHL", "PG", "IBM", "KO", "SNY", "T", "TM", "TSM", "UL"]) "EXG","NEA"
         test = ["KO", "T"]
         results = []
         for ticker in tickers:
             try:
                 result = get_statistics(ticker, periods)
-                if result.continuous_dividend_growth is True and result.dividend_yield > 0.02: #  and result.compound_annual_growth_rate + result.dividend_yield > 0.12:
+                if result.continuous_dividend_growth is True and result.dividend_yield > 0.02 and result.dividend_cagr_rates >= 0.06 and result.price_to_earnings <= 16: #  and result.compound_annual_growth_rate + result.dividend_yield > 0.12:
                     results.append(result)
             except:
+                print("Issue parsing {}".format(ticker))
                 pass
         results.sort(key=operator.attrgetter("dividend_yield"))
         for result in reversed(results):
