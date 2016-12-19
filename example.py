@@ -4,7 +4,6 @@ from matplotlib.finance import *
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import operator
 import re
 import requests
 import sys
@@ -252,25 +251,21 @@ if __name__ == "__main__":
     ticker = sys.argv[1].upper().strip()
     periods = int(sys.argv[2])
     if ticker == "DIVGROW":
-        tickers = sorted(["KO", "T", "CSCO", "BA", "MSFT", "AAPL", "NTT", "CVX", "INTC", "PG", "PNNT", "ABBV", "AFL",
-                          "O", "TGT", "BBL", "CB", "CMI", "D", "DIS", "ES", "F", "GD", "GILD", "GPS", "HP", "YUM",
-                          "IBM", "JNJ", "KMB", "LMT", "MAIN", "MCD", "MMM", "MO", "NKE", "NOC", "OHI", "PFE", "HPQ",
-                          "QCOM", "RAI", "RTN", "STAG", "TROW", "TRV", "UNP", "UPS", "VLO", "WBA", "WFC", "WMT", "XOM",
-                          "EAT"])
-        # large_caps = sorted(["CHL", "PG", "IBM", "KO", "SNY", "T", "TM", "TSM", "UL"]) "EXG","NEA"
-        results = []
-        for ticker in tickers:
-            try:
-                result = get_statistics(ticker, periods)
-                results.append(result)
-            except:
-                print("Issue parsing {}".format(ticker))
-                pass
-        # results.sort(key=operator.attrgetter("dividend_yield"))
-        # results.sort(key=operator.attrgetter("rating"))
-        results.sort(key=lambda r: (r.rating, r.dividend_yield))
-        for result in reversed(results):
-            print_summary(result)
+        # with open("watch_list.txt").readlines() as watch_list:
+        watch_list = open("watch_list.txt", "rb").readlines()
+        for line in watch_list:
+            tickers = line.strip().split()
+            results = []
+            for ticker in tickers:
+                try:
+                    result = get_statistics(ticker, periods)
+                    results.append(result)
+                except:
+                    print("Issue parsing {}".format(ticker))
+                    pass
+            results.sort(key=lambda r: (r.rating, r.dividend_yield))
+            for result in reversed(results):
+                print_summary(result)
     else:
         result = get_statistics(ticker, periods)
         print_summary(result)
