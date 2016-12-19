@@ -254,7 +254,7 @@ if __name__ == "__main__":
         # with open("watch_list.txt").readlines() as watch_list:
         watch_list = open("watch_list.txt", "rb").readlines()
         for line in watch_list:
-            tickers = line.strip().split()
+            tickers = [x.decode("utf-8") for x in line.strip().split()]
             results = []
             for ticker in tickers:
                 try:
