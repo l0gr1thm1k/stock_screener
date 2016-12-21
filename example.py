@@ -7,6 +7,7 @@ from urllib.request import urlopen
 import re
 import requests
 import sys
+import math
 
 
 class Stock:
@@ -88,14 +89,27 @@ def get_statistics(ticker_symbol, time_periods=5):
     default_key_statistics = r.json()["quoteSummary"]["result"][0]["defaultKeyStatistics"]
     financial_data = r.json()["quoteSummary"]["result"][0]["financialData"]
 
-    # stock.book_value = default_key_statistics["bookValue"]["raw"] # missing 'raw' field
+    stock.current_price = financial_data["currentPrice"]["raw"]
+    try:
+        book_value = default_key_statistics["bookValue"]["raw"]
+        trailing_eps = default_key_statistics["trailingEps"]["raw"]
+        graham = calc_graham_num(trailing_eps, book_value)
+        stock.discount = (graham / stock.current_price) - 1
+    except KeyError:
+        stock.discount = "N/A"
     # stock.price_to_book = default_key_statistics["priceToBook"]["raw"] # missing 'raw' field
     # stock.beta = default_key_statistics["beta"]["raw"] # missing 'raw' field
     # stock.forward_eps = default_key_statistics["forwardEps"]["raw"]
-    # stock.trailing_eps = default_key_statistics["trailingEps"]["raw"]
+
     # stock.peg_ratio = default_key_statistics["pegRatio"]["raw"] # missing 'raw' field
-    stock.current_price = financial_data["currentPrice"]["raw"]
-    # stock.debt_to_equity = financial_data["debtToEquity"]["raw"]
+    if "raw" in financial_data["debtToEquity"]:
+        stock.debt_to_equity = financial_data["debtToEquity"]["raw"]
+    elif financial_data["debtToEquity"] == {}:
+        stock.debt_to_equity = "N/A"
+    else:
+        stock.debt_to_equity = financial_data["debtToEquity"]
+        print(stock.debt_to_equity)
+        sys.exit(1)
     # stock.free_cash_flow = financial_data["freeCashflow"]["raw"]
     # stock.operating_cash_flow = financial_data["operatingCashflow"]["raw"]
     try:
@@ -114,11 +128,10 @@ def get_statistics(ticker_symbol, time_periods=5):
     stock.name = format_company_name(stock.name)
     stock.continuous_dividend_growth = continuous_dividend_increases(stock)
     stock.dividend_cagr_rates = calc_median_dividend_cagr(stock)
-
     stock.rating = ""
     if stock.continuous_dividend_growth is True:
         stock.rating += "*"
-    if stock.dividend_yield > 0.02:
+    if 0.08 > stock.dividend_yield > 0.02:
         stock.rating += "*"
     if stock.dividend_cagr_rates >= 0.06:
         stock.rating += "*"
@@ -126,8 +139,19 @@ def get_statistics(ticker_symbol, time_periods=5):
         stock.rating += "*"
     if stock.dividend_payout_ratio <= 0.6:
         stock.rating += "*"
+    if stock.debt_to_equity == "N/A":
+        pass
+    elif stock.debt_to_equity <= 60.0:
+        stock.rating += "*"
+    if stock.discount == "N/A":
+        pass
+    elif stock.discount >= 0.1:
+        stock.rating += "*"
     return stock
 
+
+def calc_graham_num(eps, book):
+    return math.sqrt(22.5*eps*book)
 
 def calc_median_dividend_cagr(stock):
     yields = calculate_dividend_increase(stock)
@@ -243,6 +267,14 @@ def print_summary(stock):
     print("    Median of dividend 5-year compound annual growth is at least 6%: {:.2f}%".format(stock.dividend_cagr_rates*100))
     print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
     print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
+    if type(stock.debt_to_equity) is float:
+        print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
+    else:
+        print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
+    if type(stock.discount) is float:
+        print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount*100))
+    else:
+        print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
     print("    Star Rating: {}".format(stock.rating))
     print("%" * 80)
 
@@ -250,9 +282,13 @@ def print_summary(stock):
 if __name__ == "__main__":
     ticker = sys.argv[1].upper().strip()
     periods = int(sys.argv[2])
-    if ticker == "DIVGROW":
+    if ticker == "DIVGROW" or ticker == "WINNERS":
         # with open("watch_list.txt").readlines() as watch_list:
-        watch_list = open("watch_list.txt", "rb").readlines()
+        if ticker == "DIVGROW":
+            watch_list = open("watch_list.txt", "rb").readlines()
+        else:
+            watch_list = open("winners", "rb").readlines()
+        summed_results = []
         for line in watch_list:
             tickers = [x.decode("utf-8") for x in line.strip().split()]
             results = []
@@ -263,9 +299,11 @@ if __name__ == "__main__":
                 except:
                     print("Issue parsing {}".format(ticker))
                     pass
-            results.sort(key=lambda r: (r.rating, r.dividend_yield))
-            for result in reversed(results):
-                print_summary(result)
+            # results.sort(key=lambda r: (r.rating, r.dividend_yield))
+            summed_results += results
+        summed_results.sort(key=lambda r: (r.rating, r.dividend_yield))
+        for result in reversed(summed_results):
+            print_summary(result)
     else:
         result = get_statistics(ticker, periods)
         print_summary(result)
