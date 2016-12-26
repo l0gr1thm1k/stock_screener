@@ -4,6 +4,7 @@ from matplotlib.finance import *
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import urllib
 import re
 import requests
 import sys
@@ -24,7 +25,10 @@ def make_soup(url):
     @param  - url: the url destination to turn into soup
     @return - soup: the soup tree object
     """
-    request = urlopen(url)
+    try:
+        request = urlopen(url)
+    except:
+        request = urlopen(url)
     raw_text = request.read()
     soup = BeautifulSoup(raw_text, "html.parser")
     return soup
@@ -40,6 +44,7 @@ def make_base_urls(soup, url):
     @return - urls: a dictionary of urls
     """
     urls = {}
+    ticker = url.split("/")[-1]
     for link in soup.find_all("a"):
         try:
             suffix = link.get("href")
@@ -71,8 +76,11 @@ def get_statistics(ticker_symbol, time_periods=5):
     # get base urls with links to other information type pages
     urls = make_base_urls(soup, url)
     stock.urls = urls
-    profile = make_soup(stock.urls["profile"])
-    statistics = make_soup(stock.urls["key-statistics"])
+    try:
+        profile = make_soup(stock.urls["profile"])
+        statistics = make_soup(stock.urls["key-statistics"])
+    except KeyError:
+        return stock
     # print(re.findall(".{100}1\.96", soup.get_text()))
     # you will get historical data here
 
@@ -151,7 +159,10 @@ def get_statistics(ticker_symbol, time_periods=5):
 
 
 def calc_graham_num(eps, book):
-    return math.sqrt(22.5*eps*book)
+    try:
+        return math.sqrt(22.5*eps*book)
+    except ValueError:
+        return float('-inf')
 
 def calc_median_dividend_cagr(stock):
     yields = calculate_dividend_increase(stock)
@@ -261,22 +272,25 @@ def compound_annual_growth_rate(ticker, n=5):
 
 
 def print_summary(stock):
-    print(stock.name.strip() + " (" + stock.ticker + ")")
-    print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_growth)))
-    print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
-    print("    Median of dividend 5-year compound annual growth is at least 6%: {:.2f}%".format(stock.dividend_cagr_rates*100))
-    print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
-    print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
-    if type(stock.debt_to_equity) is float:
-        print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
-    else:
-        print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
-    if type(stock.discount) is float:
-        print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount*100))
-    else:
-        print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
-    print("    Star Rating: {}".format(stock.rating))
-    print("%" * 80)
+    try:
+        print(stock.name.strip() + " (" + stock.ticker + ")")
+        print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_growth)))
+        print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
+        print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods, stock.dividend_cagr_rates*100))
+        print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
+        print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
+        if type(stock.debt_to_equity) is float:
+            print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
+        else:
+            print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
+        if type(stock.discount) is float:
+            print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount*100))
+        else:
+            print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
+        print("    Star Rating: {}".format(stock.rating))
+        print("%" * 80)
+    except AttributeError:
+        pass
 
 
 if __name__ == "__main__":
@@ -305,5 +319,9 @@ if __name__ == "__main__":
         for result in reversed(summed_results):
             print_summary(result)
     else:
-        result = get_statistics(ticker, periods)
-        print_summary(result)
+        try:
+            result = get_statistics(ticker, periods)
+            print_summary(result)
+        except:
+            print("Issue parsing {}".format(ticker), file=sys.stderr)
+            sys.exit(0)
