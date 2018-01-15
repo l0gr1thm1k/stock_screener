@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import example as screen
+import screen
 
 
 def make_ccc_list():
