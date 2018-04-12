@@ -1,0 +1,13 @@
+stock_current_price
+book_value
+trailing_eps
+graham = calc_graham_num(trailing_eps, book_value)
+stock_discount = (graham / stock.current_price) - 1
+debt_to_equity
+annual_dividend
+dividend_yield
+dividend_payout_ratio
+price_to_earnings
+compound_annual_growth_rate
+dividend_continuous_growth_rate == boolean
+dividend_compound_annual_growth_rate
