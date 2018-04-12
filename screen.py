@@ -158,58 +158,7 @@ def get_statistics(ticker_symbol, time_periods=5):
     return stock
 
 
-def calc_graham_num(eps, book):
-    try:
-        return math.sqrt(22.5*eps*book)
-    except ValueError:
-        return float('-inf')
 
-def calc_median_dividend_cagr(stock):
-    yields = calculate_dividend_increase(stock)
-    current_yield = stock.annual_dividend / 4  # will have to fix this later
-    compound_annual_growth_rates = []
-    for index, old_yield in enumerate(yields):
-        rate = ((current_yield / old_yield) ** (1/ (index+1) )) - 1
-        compound_annual_growth_rates.append(rate)
-    return median(compound_annual_growth_rates)
-
-
-def median(x):
-    try:
-        if len(x) % 2 != 0:
-            return sorted(x)[int(len(x)/2)]
-        else:
-            mid_1 = len(x) // 2
-            mid_2 = mid_1 + 1
-            mid_avg = (sorted(x)[mid_1] + sorted(x)[mid_2])/2
-            return mid_avg
-    except IndexError:
-        return 0.0
-
-
-def calculate_dividend_increase(stock):
-    history = stock.dividend_history
-    yields = []
-    annual_dividend = 0
-    payout_per_year = 0
-    year_regex = re.compile("^(\d+)")
-    year = ""
-    for entry in history:
-        temp = re.search(year_regex, entry[0]).group(0)
-        if temp == year:
-            annual_dividend += entry[1]
-            payout_per_year += 1
-        else:
-            if year != "":
-                yields.append(annual_dividend/payout_per_year)
-                year = temp
-                payout_per_year = 1
-                annual_dividend = entry[1]
-            else:
-                year = temp
-                annual_dividend += entry[1]
-                payout_per_year += 1
-    return yields
 
 
 def continuous_dividend_increases(stock):
