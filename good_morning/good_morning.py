@@ -18,7 +18,7 @@ class KeyRatiosDownloader(object):
     def __init__(self, table_prefix="morningstar_"):
         self._table_prefix = table_prefix
 
-    def download(self, ticker, conn=None, region='GBR', culture='en_US', currency='USD'):
+    def download(self, ticker, conn=None, region='USA', culture='en_US', currency='USD'):
         url = (r'http://financials.morningstar.com/ajax/exportKR2CSV.html?' +
                r'&callback=?&t={t}&region={reg}&culture={cult}&cur={cur}'.format(t=ticker,
                                                                                  reg=region,
@@ -191,7 +191,138 @@ class FinancialsDownloader(object):
             return self._parse(result_soup)
 
     def _parse(self, soup):
-        
+        left = soup.find(u'div', u'left').div
+        main = soup.find(u'div', u'main').find(u'div', u'rf_table')
+        year = main.find(u'div', {u'id', u'Year'})
+        self._year_ids = [node.attrs[u'id'] for node in year]
+        period_month = pd.datetime.strptime(year.div.text, u'%Y-%m').month
+        self._period_range = pd.period_range(year.div.text,
+                                             periods=len(self._year_ids),
+                                             freq=pd.tseries.offsets.YearEnd(month=period_month))
+        unit = left.find(u'div', {u'id', u'unitsAndFiscalYear'})
+        self._fiscal_year_end = int(unit.attrs[u'fyenumber'])
+        self._currency = unit.attrs[u'currency']
+        self._data = []
+        self._label_index = 0
+        self._read_labels(left)
+        self._data_index = 0
+        self._read_data(main)
+        return pd.DataFrame(self._data,
+                            columns=[u'parent_index', u'title'] +
+                            list(self._period_range))
+
+    def _read_labels(self, root_node, parent_label_index=None):
+        for node in root_node:
+            if node.has_attr(u'class') and u'r_content' in node.attrs[u'class']:
+                self._read_labels(node, self._label_index - 1)
+            if (node.has_attr(u'id')
+                and node.attrs[u'id'].startswith(u'label')
+                and node.attrs[u'id'].endswith(u'padding')
+                and (not node.has_attr(u'style') or u'display:none' not in node.attrs[u'style'])):
+                label_id = node.attrs[u'id'][6:]
+                label_title = (node.div.attrs[u'title']
+                               if node.div.has_attr(u'title')
+                               else node.div.text)
+                self._data.append({
+                    u'id': label_id,
+                    u'index': self._label_index,
+                    u'parent_index': (parent_label_index
+                                      if parent_label_index is not None
+                                      else self._label_index),
+                    u'title': label_title})
+                self._label_index += 1
+
+    def _read_data(self, root_node):
+        for node in root_node:
+            if node.has_attr(u'class') and u'r_content' in node.attrs[u'class']:
+                self._read_data(node)
+            if (node.has_attr(u'id')
+                and node.attrs[u'id'].startswith(u'data')
+                and node.attrs[u'id'].endswith(u'padding')
+                and (not node.has_attr(u'style') or u'display:none' not in node.attrs[u'style'])):
+                data_id = node.attrs[u'id'][5:]
+                while self._data_index < len(self._data) and self._data[self._data_index][u'id'] != data_id:
+                    self._data_index += 1
+                assert(self._data_index < len(self._data)
+                       and self._data[self._data_index][u'id'] == data_id)
+                for (i, child) in enumerate(node.children):
+                    try:
+                        value = float(child.attrs[u'rawvalue'])
+                    except ValueError:
+                        value = None
+                    self._data[self._data_index][self._period_range[i]] = value
+                self._data_index += 1
+
+    def _upload_frame(self, frame, ticker, table_name, conn):
+        if not _db_table_exists(table_name, conn):
+            _db_execute(self._get_db_create_table(table_name), conn)
+        _db_execute(self._get_db_replace_values(ticker, frame, table_name), conn)
+
+    def _upload_unit(self, ticker, table_name, conn):
+        if not _db_table_exists(table_name, conn):
+            _db_execute(
+                u'CREATE TABLE `%s` (\n' % table_name +
+                u'    `ticker` varchar(50) NOT NULL\n' +
+                u'        COMMENT "Exchange:Ticker",\n' +
+                u'    `fiscal_year_end` int(10) unassigned NOT NULL\n' +
+                u'        COMMENT "Fiscal Year End Month",\n' +
+                u'    `currency` varchar(50) NOT NULL\n' +
+                u'        COMMENT "Currency",\n' +
+                u'    PRIMARY KEY USING BTREE (`ticker`))\n' +
+                u'ENGINE=MyISAM DEFAULT CHARSET=utf8', conn)
+        _db_execute(
+            u'REPLACE INTO `%s`\n' % table_name +
+            u'    (`ticker`, `fiscal_year_end`, `currency`)\nVALUES\n' +
+            u'("%s", %d, "%s")' % (ticker, self._fiscal_year_end, self._currency), conn)
+
+    @staticmethod
+    def _get_db_create_table(table_name):
+        u"""Returns the MySQL CREATE TABLE statement for the given table_name.
+        :param table_name: Name of the MySQL table.
+        :return MySQL CREATE TABLE statement.
+        """
+        year = date.today().year
+        year_range = range(year - 6, year + 2)
+        columns = u',\n'.join(
+            [u'  `year_%d` DECIMAL(20,5) DEFAULT NULL ' % year +
+             u'COMMENT "Year %d"' % year
+             for year in year_range])
+        return (
+            u'CREATE TABLE `%s` (\n' % table_name +
+            u'  `ticker` VARCHAR(50) NOT NULL COMMENT "Exchange:Ticker",\n' +
+            u'  `id` int(10) unsigned NOT NULL COMMENT "Id",\n' +
+            u'  `parent_id` int(10) unsigned NOT NULL COMMENT "Parent Id",\n' +
+            u'  `item` varchar(500) NOT NULL COMMENT "Item",\n' +
+            u'%s,\n' % columns +
+            u'  PRIMARY KEY USING BTREE (`ticker`, `id`),\n' +
+            u'  KEY `ix_ticker` USING BTREE (`ticker`))\n' +
+            u'ENGINE=MyISAM DEFAULT CHARSET=utf8')
+
+    @staticmethod
+    def _get_db_replace_values(ticker, frame,
+                               table_name):
+        u"""Returns the MySQL REPLACE INTO statement for the given
+        Morningstar ticker and the corresponding pandas.DataFrame.
+        :param ticker: Morningstar ticker.
+        :param frame: pandas.DataFrame.
+        :param table_name: Name of the MySQL table.
+        :return MySQL REPLACE INTO statement.
+        """
+        columns = [u'`ticker`', u'`id`, `parent_id`, `item`'] + \
+                  [u'`year_%d`' % period.year for period in
+                   frame.columns[2:]]
+        return (
+            u'REPLACE INTO `%s`\n' % table_name +
+            u'  (%s)\nVALUES\n' % u', '.join(columns) +
+            u',\n'.join([u'("' + ticker + u'", %d, %d, "%s", ' %
+                        (index, frame.ix[index, u'parent_index'],
+                         frame.ix[index, u'title']) +
+                        u', '.join(
+                            [u'NULL' if np.isnan(frame.ix[index, period])
+                             else u'%.5f' % frame.ix[index, period]
+                             for period in frame.columns[2:]]) + u')'
+                        for index in frame.index]))
+
 
 def _db_table_exists(table_name, conn):
     cursor = conn.cursor()
