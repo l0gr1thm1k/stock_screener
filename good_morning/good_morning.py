@@ -1,6 +1,7 @@
 """Module for downloading financial data from financials.morningstar.com.
 """
 
+import copy
 import csv
 import json
 import numpy as np
@@ -21,7 +22,7 @@ class KeyRatiosDownloader(object):
         """
         self._table_prefix = table_prefix
 
-    def download(self, ticker, conn=None, region='GBR', culture='en_US', currency='USD'):
+    def download(self, ticker, conn=None, region='USA', culture='en_US', currency='USD'):
         u"""Downloads and returns key ratios for the given Morningstar ticker.
         Downloads and returns an array of pandas.DataFrames containing the key
         ratios for the given Morningstar ticker. If the MySQL connection is
@@ -38,6 +39,10 @@ class KeyRatiosDownloader(object):
                r'&callback=?&t={t}&region={reg}&culture={cult}&cur={cur}'.format(
                    t=ticker, reg=region, cult=culture, cur=currency))
         with urllib.request.urlopen(url) as response:
+            with urllib.request.urlopen(url) as response_copy:
+                company_name = self._parse_company_name(response_copy)
+            print(company_name)
+
             tables = self._parse_tables(response)
             response_structure = [
                 # Original Name, New pandas.DataFrame Name
@@ -71,12 +76,23 @@ class KeyRatiosDownloader(object):
                                  "you entered or it is INVALID. Please try "
                                  "again.")
 
-            currency = re.match(u'^.* ([A-Z]+) Mil$',
+            currency = re.match(r'^.* ([A-Z]+) Mil$',
                                 frames[0].index[0]).group(1)
             frames[0].index.name += u' ' + currency
             if conn:
                 self._upload_frames_to_db(ticker, frames, conn)
             return frames
+
+    def _parse_company_name(self, response):
+        """
+
+        :param response:
+        :return:
+        """
+        text = response.read().decode('utf-8')
+        first_line = text.split('\n')[0]
+        company_name = re.findall(r'(?<=for ).*', first_line)[0]
+        return company_name
 
     @staticmethod
     def _parse_tables(response):
@@ -124,11 +140,10 @@ class KeyRatiosDownloader(object):
 
         # Fail Early on Empty String
         if len(tables) == 0:
-            return ("MorningStar could not find the ticker")
+            return "MorningStar could not find the ticker"
 
         period_start = tables[0][1].ix[0][1]
         period_month = pd.datetime.strptime(period_start, u'%Y-%m').month
-        # period_freq = pd.datetools.YearEnd(month=period_month)
         period_freq = pd.tseries.offsets.YearEnd(month=period_month)
         frames = []
         for index, (check_name, frame_name) in enumerate(response_structure):
@@ -182,9 +197,9 @@ class KeyRatiosDownloader(object):
         :return Name that can be used in a MySQL database.
         """
         name = (name.lower()
-            .replace(u'/', u' per ')
-            .replace(u'&', u' and ')
-            .replace(u'%', u' percent '))
+                .replace(u'/', u' per ')
+                .replace(u'&', u' and ')
+                .replace(u'%', u' percent '))
         name = re.sub(r'[^a-z0-9]', u' ', name)
         name = re.sub(r'\s+', u' ', name).strip()
         return name.replace(u' ', u'_')
@@ -331,7 +346,6 @@ class FinancialsDownloader(object):
         period_month = pd.datetime.strptime(year.div.text, u'%Y-%m').month
         self._period_range = pd.period_range(
             year.div.text, periods=len(self._year_ids),
-            # freq=pd.datetools.YearEnd(month=period_month))
             freq=pd.tseries.offsets.YearEnd(month=period_month))
         unit = left.find(u'div', {u'id': u'unitsAndFiscalYear'})
         self._fiscal_year_end = int(unit.attrs[u'fyenumber'])
@@ -440,7 +454,7 @@ class FinancialsDownloader(object):
         :return MySQL CREATE TABLE statement.
         """
         year = date.today().year
-        year_range = xrange(year - 6, year + 2)
+        year_range = range(year - 6, year + 2)
         columns = u',\n'.join(
             [u'  `year_%d` DECIMAL(20,5) DEFAULT NULL ' % year +
              u'COMMENT "Year %d"' % year
@@ -510,9 +524,18 @@ def _db_execute(query, conn):
 
 if __name__ == '__main__':
     kr = KeyRatiosDownloader()
-    kr_frames = kr.download('T')
-    # print(kr_frames[0].head())
+    s_and_p = open('s_and_p_500.txt', 'r').readlines()
+    for stock in s_and_p:
+        # print(stock)
+        try:
+            kr_frames = kr.download(stock.strip())
+        except:
+            continue
+    #ratios = kr_frames[0]
 
-    kr = FinancialsDownloader()
-    kr_fins = kr.download('T')
-    print(kr_fins)
+    # print(kr_frames[0]['2017'])
+
+    #kr = FinancialsDownloader()
+    #kr_fins = kr.download('T')
+    # print(kr_fins.keys())
+    # print(kr_fins['cash_flow'])

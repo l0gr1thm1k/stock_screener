@@ -6,7 +6,8 @@ import time
 
 import pymysql
 
-from good_morning import good_morning as gm
+# from .good_morning import good_morning as gm
+import good_morning as gm
 
 DB_HOST = 'db_host'
 DB_USER = 'db_user'
@@ -73,7 +74,9 @@ sp500_2015_10 = [
     'WU', 'WY', 'WYN', 'WYNN', 'XEC', 'XEL', 'XL', 'XLNX', 'XOM', 'XRAY', 'XRX',
     'XYL', 'YHOO', 'YUM', 'ZBH', 'ZION', 'ZTS']
 
-for ticker in sp500_2015_10:
+tickers = sorted(['MAIN', 'OHI', 'F', 'QCOM', 'NIE', 'BXMT', 'T'])
+
+for ticker in tickers:
     print(ticker, end='')
     try:
         kr.download(ticker, conn)
@@ -81,4 +84,4 @@ for ticker in sp500_2015_10:
         time.sleep(1)
         print(' ... success')
     except Exception as e:
-        print(' ... failed', e
+        print(' ... failed', e)
