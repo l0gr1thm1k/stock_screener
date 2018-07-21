@@ -19,7 +19,7 @@ class AlphaVantage:
         :return user: Return the username whose API key we will use when calling AlphaVantage.
         :return key: Return the API key to access financial information from AlphaVantage.
         """
-        info = open("credentials.txt", "r").readlines()
+        info = open("alpha_vantage/credentials.txt", "r").readlines()
         user = info[0].split("=")[1].strip()
         key = info[1].split("=")[1].strip()
         return user, key
@@ -56,7 +56,7 @@ class AlphaVantage:
             formatted_url = base_url.format(func, ticker, output, '&interval=' + interval, self.key)
 
         with urllib.request.urlopen(formatted_url) as response:
-            json_response = json.loads(response.read())
+            json_response = json.loads(response.read().decode("utf-8"))
         return json_response
 
 
@@ -65,6 +65,6 @@ if __name__ == '__main__':
     av = AlphaVantage()
     print("user: {}".format(av.user))
     print("API key: {}".format(av.key))
-    result = av.send_request("TIME_SERIES_DAILY", "NVDA")
+    result = av.send_request("TIME_SERIES_DAILY", "T")
     pp = pprint.PrettyPrinter(depth=4)
     pp.pprint(result)

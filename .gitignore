@@ -2,3 +2,5 @@
 \.idea/
 
 good_morning/__pycache__/
+
+utils/__pycache__/

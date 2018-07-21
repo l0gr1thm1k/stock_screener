@@ -1,7 +1,6 @@
 """Module for downloading financial data from financials.morningstar.com.
 """
 
-import copy
 import csv
 import json
 import numpy as np
@@ -41,7 +40,7 @@ class KeyRatiosDownloader(object):
         with urllib.request.urlopen(url) as response:
             with urllib.request.urlopen(url) as response_copy:
                 company_name = self._parse_company_name(response_copy)
-            print(company_name)
+            # print(company_name)
 
             tables = self._parse_tables(response)
             response_structure = [
@@ -81,7 +80,7 @@ class KeyRatiosDownloader(object):
             frames[0].index.name += u' ' + currency
             if conn:
                 self._upload_frames_to_db(ticker, frames, conn)
-            return frames
+            return frames, company_name
 
     def _parse_company_name(self, response):
         """
@@ -526,7 +525,6 @@ if __name__ == '__main__':
     kr = KeyRatiosDownloader()
     s_and_p = open('s_and_p_500.txt', 'r').readlines()
     for stock in s_and_p:
-        # print(stock)
         try:
             kr_frames = kr.download(stock.strip())
         except:

@@ -1,61 +1,57 @@
 #!/usr/bin/python3
 
-from matplotlib.finance import *
-from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import urllib
+
+import datetime
 import re
 import requests
 import sys
-import math
+
+from good_morning.good_morning import KeyRatiosDownloader, FinancialsDownloader
+from utils import utils
+from alpha_vantage.alpha_vantage import  AlphaVantage
+
+kr = KeyRatiosDownloader()
+kf = FinancialsDownloader()
+av = AlphaVantage()
 
 
 class Stock:
     """
     @desc   - a basic class to hold stock properties as objects.
     """
-    def __init__(self, ticker_symbol):
+    def __init__(self, ticker_symbol, periods=5):
+        self.periods = periods
         self.ticker = ticker_symbol
+        self.frames, self.name = kr.download(self.ticker)
+        self.financials = kf.download(self.ticker)
+        self.returns = av.send_request("TIME_SERIES_DAILY", self.ticker)
+        self.today = utils.get_date_str()
 
 
-def make_soup(url):
-    """
-    @desc   - make a BeautifulSoup tree object for parsing
-    @param  - url: the url destination to turn into soup
-    @return - soup: the soup tree object
-    """
-    try:
-        request = urlopen(url)
-    except:
-        request = urlopen(url)
-    raw_text = request.read()
-    soup = BeautifulSoup(raw_text, "html.parser")
-    return soup
+        self.continuous_dividend_increases = self._continuous_dividend_increases()
+
+        self.price = self.returns['Time Series (Daily)'][self.today]['4. close']
+        # DIVIDEND YIELD
+        # https://www.morningstar.com/stocks/XNYS/T/quote.html
+        # Or use AlphaVantage
+
+    def _continuous_dividend_increases(self):
+        """
+
+        :return:
+        """
+        yields = self.frames[0].iloc[6][-self.periods:]
+        present_yield = 0.0
+        for i in yields:
+            if i > present_yield:
+                present_yield = i
+            else:
+                return False
+        return True
 
 
-def make_base_urls(soup, url):
-    """
-    @desc   - given a soup object taken from a yahoo finance quote page,
-              generate a basic list url links to other metrics about
-              the associated company
-    @param  - soup: a BeautifulSoup soup object
-    @param  - url: the base url from which links are created
-    @return - urls: a dictionary of urls
-    """
-    urls = {}
-    ticker = url.split("/")[-1]
-    for link in soup.find_all("a"):
-        try:
-            suffix = link.get("href")
-            if suffix.startswith("/quote") and ticker in suffix:
-                new_url = re.sub("/quote/{}".format(ticker), suffix, url)
-                match = re.findall("%s/(.*?)\?p=" % ticker, new_url)
-                if match:
-                    urls[match[0]] = new_url
-        except AttributeError:
-            continue
-    return urls
 
 
 def get_statistics(ticker_symbol, time_periods=5):
@@ -160,17 +156,6 @@ def get_statistics(ticker_symbol, time_periods=5):
 
 
 
-
-def continuous_dividend_increases(stock):
-    yields = calculate_dividend_increase(stock)
-    for i, j in enumerate(yields[:-1]):
-        if j > yields[i+1]:
-            continue
-        else:
-            return False
-    return True
-
-
 def get_dividend_history(ticker, n):
     """
     @desc   - get historical dividend payout information
@@ -220,30 +205,45 @@ def compound_annual_growth_rate(ticker, n=5):
     return cagr
 
 
-def print_summary(stock):
-    try:
-        print(stock.name.strip() + " (" + stock.ticker + ")")
-        print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_growth)))
-        print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
-        print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods, stock.dividend_cagr_rates*100))
-        print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
-        print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
-        if type(stock.debt_to_equity) is float:
-            print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
-        else:
-            print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
-        if type(stock.discount) is float:
-            print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount*100))
-        else:
-            print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
-        print("    Star Rating: {}".format(stock.rating))
-        print("%" * 80)
-    except AttributeError:
-        pass
+def get_date_str():
+    """
+    Take the current date and format the results to string.
 
+    :return today_str: return a string formatted as YYYY-MM-DD
+    """
+    today = datetime.datetime.now()
+    today_str = today.strftime('%Y-%m-%d')
+    return today_str
+
+def print_summary(stock):
+    # try:
+    print(stock.name.strip() + " (" + stock.ticker + ")")
+    print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_increases)))
+    print("    Stock's price: {}".format(stock.price))
+    '''
+    print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
+    print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods, stock.dividend_cagr_rates*100))
+    print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
+    print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
+    if type(stock.debt_to_equity) is float:
+        print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
+    else:
+        print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
+    if type(stock.discount) is float:
+        print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount*100))
+    else:
+        print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
+    print("    Star Rating: {}".format(stock.rating))
+    print("%" * 80)
+except AttributeError:
+    pass
+'''
 
 if __name__ == "__main__":
     ticker = sys.argv[1].upper().strip()
+    this_stock = Stock(ticker)
+    print_summary(this_stock)
+    '''
     periods = int(sys.argv[2])
     if ticker == "DIVGROW" or ticker == "WINNERS":
         # with open("watch_list.txt").readlines() as watch_list:
@@ -274,3 +274,4 @@ if __name__ == "__main__":
         except:
             print("Issue parsing {}".format(ticker), file=sys.stderr)
             sys.exit(0)
+'''
