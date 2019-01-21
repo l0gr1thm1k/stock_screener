@@ -1,16 +1,15 @@
 #!/usr/bin/python3
 
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-
 import datetime
 import re
 import requests
 import sys
 
+from alpha_vantage.alpha_vantage import AlphaVantage
 from good_morning.good_morning import KeyRatiosDownloader, FinancialsDownloader
+from nasdaq.nasdaq_scrape import parse_finance_page
 from utils import utils
-from alpha_vantage.alpha_vantage import  AlphaVantage
+
 
 kr = KeyRatiosDownloader()
 kf = FinancialsDownloader()
@@ -19,7 +18,7 @@ av = AlphaVantage()
 
 class Stock:
     """
-    @desc   - a basic class to hold stock properties as objects.
+    a basic class to hold stock properties as objects.
     """
     def __init__(self, ticker_symbol, periods=5):
         self.periods = periods
@@ -27,14 +26,20 @@ class Stock:
         self.frames, self.name = kr.download(self.ticker)
         self.financials = kf.download(self.ticker)
         self.returns = av.send_request("TIME_SERIES_DAILY", self.ticker)
-        self.today = utils.get_date_str()
-
+        self.today = utils.get_today_str()
+        self.nasdaq_statistics = parse_finance_page(self.ticker)
 
         self.continuous_dividend_increases = self._continuous_dividend_increases()
+        self.price = self._get_price()
+        self.dividend_yield = self._get_dividend_yield()
+        self.price_to_earnings_ratio = self._get_price_to_earnings_ratio()
+        self.dividend_compound_annual_growth_rate = 0.0
+        self.dividend_payout_ratio = 0.0
+        self.debt_to_equity = 0.0
+        self.discount = 0.0
 
-        self.price = self.returns['Time Series (Daily)'][self.today]['4. close']
         # DIVIDEND YIELD
-        # https://www.morningstar.com/stocks/XNYS/T/quote.html
+        # https://www.morningstar.com/stocks/XNYS/XOM/quote.html
         # Or use AlphaVantage
 
     def _continuous_dividend_increases(self):
@@ -51,7 +56,35 @@ class Stock:
                 return False
         return True
 
+    def _get_price(self):
+        """
 
+        :return:
+        """
+        try:
+            price = float(self.returns['Time Series (Daily)'][self.today]['4. close'])
+        except KeyError:
+            last_business_day = utils.get_most_recent_date(list(self.returns['Time Series (Daily)'].keys()))
+            price = float(self.returns['Time Series (Daily)'][last_business_day]['4. close'])
+
+        return round(price, 2)
+
+    def _get_dividend_yield(self):
+        """
+
+        :return:
+        """
+        div_yield = self.nasdaq_statistics['key_stock_data']['Current Yield']
+        div_yield = float(re.findall('\d+\.\d*', div_yield)[0])
+        return div_yield
+
+    def _get_price_to_earnings_ratio(self):
+        """
+
+        :return:
+        """
+        pe_ratio = float(self.nasdaq_statistics['key_stock_data']['P/E Ratio'])
+        return pe_ratio
 
 
 def get_statistics(ticker_symbol, time_periods=5):
@@ -154,8 +187,6 @@ def get_statistics(ticker_symbol, time_periods=5):
     return stock
 
 
-
-
 def get_dividend_history(ticker, n):
     """
     @desc   - get historical dividend payout information
@@ -201,43 +232,26 @@ def compound_annual_growth_rate(ticker, n=5):
     result = get_historical_price_data(ticker, n)
     then_close = result[0][4]
     today_close = result[-1][4]
-    cagr = ((today_close / then_close) ** (1/n)) - 1
-    return cagr
+    comp_annual_growth_rate = ((today_close / then_close) ** (1/n)) - 1
+    return comp_annual_growth_rate
 
-
-def get_date_str():
-    """
-    Take the current date and format the results to string.
-
-    :return today_str: return a string formatted as YYYY-MM-DD
-    """
-    today = datetime.datetime.now()
-    today_str = today.strftime('%Y-%m-%d')
-    return today_str
 
 def print_summary(stock):
-    # try:
     print(stock.name.strip() + " (" + stock.ticker + ")")
-    print("    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_increases)))
+    print("    {} consecutive years of dividend increases: {}".format(stock.periods,
+                                                                      str(stock.continuous_dividend_increases)))
     print("    Stock's price: {}".format(stock.price))
-    '''
-    print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield*100))
-    print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods, stock.dividend_cagr_rates*100))
-    print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings))
-    print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100))
-    if type(stock.debt_to_equity) is float:
-        print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
-    else:
-        print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
-    if type(stock.discount) is float:
-        print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount*100))
-    else:
-        print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
-    print("    Star Rating: {}".format(stock.rating))
+    print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield))
+    print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods,
+                                                                                                 stock.dividend_compound_annual_growth_rate))
+    print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings_ratio))
+    print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio))
+    print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
+    print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
+    # print("    Star Rating: {}".format(stock.rating))
     print("%" * 80)
-except AttributeError:
-    pass
-'''
+
+
 
 if __name__ == "__main__":
     ticker = sys.argv[1].upper().strip()
