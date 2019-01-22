@@ -8,6 +8,7 @@ import sys
 from alpha_vantage.alpha_vantage import AlphaVantage
 from good_morning.good_morning import KeyRatiosDownloader, FinancialsDownloader
 from nasdaq.nasdaq_scrape import parse_finance_page
+from numpy import sqrt
 from utils import utils
 
 
@@ -33,14 +34,12 @@ class Stock:
         self.price = self._get_price()
         self.dividend_yield = self._get_dividend_yield()
         self.price_to_earnings_ratio = self._get_price_to_earnings_ratio()
-        self.dividend_compound_annual_growth_rate = 0.0
-        self.dividend_payout_ratio = 0.0
-        self.debt_to_equity = 0.0
-        self.discount = 0.0
-
-        # DIVIDEND YIELD
-        # https://www.morningstar.com/stocks/XNYS/XOM/quote.html
-        # Or use AlphaVantage
+        self.dividend_compound_annual_growth_rate = self._get_dividend_compound_annual_growth_rate(self.periods)
+        self.dividend_payout_ratio = self._get_dividends_to_eps_ratio()
+        self.debt_to_equity = self._get_debt_to_equity_ratio()
+        self.graham_number = self._get_graham_number()
+        self.discount = self._get_discount_rate()
+        self.star_rating = self._get_star_rating()
 
     def _continuous_dividend_increases(self):
         """
@@ -58,6 +57,7 @@ class Stock:
 
     def _get_price(self):
         """
+        This should be refactored to use the M* data
 
         :return:
         """
@@ -71,6 +71,7 @@ class Stock:
 
     def _get_dividend_yield(self):
         """
+        Should be refactored to use M* data.
 
         :return:
         """
@@ -86,6 +87,96 @@ class Stock:
         pe_ratio = float(self.nasdaq_statistics['key_stock_data']['P/E Ratio'])
         return pe_ratio
 
+    def _get_dividend_compound_annual_growth_rate(self, periods):
+        """
+
+        :param periods:
+        :return:
+        """
+        indices = [str(element.year) for element in self.frames[0].columns[-periods:]]
+        annualized_dividend_payments = [self.frames[0][index]['Dividends USD'] for index in indices]
+
+        start_value = annualized_dividend_payments[0]
+        end_value = annualized_dividend_payments[-1]
+        growth_rate = ((end_value / start_value) ** (1 / periods) - 1) * 100
+        return round(growth_rate, 2)
+
+    def _get_dividends_to_eps_ratio(self):
+        """
+
+        :return:
+        """
+        index = str(self.frames[0].columns[-1].year)
+
+        # dividend_payment = data[index]['Dividends USD']
+        # earnings_per_share = data[index]['Earnings Per Share USD']
+        # payout_ratio = round((dividend_payment / earnings_per_share) * 100, 2)
+        payout_ratio = self.frames[0][index]['Payout Ratio % *']
+        return payout_ratio
+
+    def _get_graham_number(self):
+        """
+        Traditionally the constant in the equation is calculated as follows:
+            EPS = 15
+            BPS = 1.5
+            CONSTANT = EPS * BPS = 22.5
+
+        However, the upper bound of EPS for defensive investing I am willing to risk is sixteen, so this modifies our
+        constant to be:
+
+            CONSTANT = 16 * 1.5 = 24
+
+        :return graham_number:
+        """
+
+        index = self.frames[0].columns[-1]
+        book_value_per_share = self.frames[0][index]['Book Value Per Share * USD']
+        earnings_per_share = self.frames[0][index]['Earnings Per Share USD']
+        graham_number = round(sqrt(24 * earnings_per_share * book_value_per_share), 2)
+
+        return graham_number
+
+    def _get_discount_rate(self):
+        """
+
+        :return float: a percentage of discount rate. positive means there exists a discount, negative mean the
+        equity is overpriced.
+        """
+        return round(((self.graham_number / self.price) - 1) * 100, 2)
+
+    def _get_debt_to_equity_ratio(self):
+        """
+
+        :return:
+        """
+        index = str(self.frames[8].columns[-1].year)
+        equity = self.frames[8][index]["Total Stockholders' Equity"]
+        liabilities = self.frames[8][index]['Total Liabilities']
+        debt_to_equity_ratio = round((liabilities / equity) * 100, 2)
+        return debt_to_equity_ratio
+
+    def _get_star_rating(self):
+        """
+
+        :return:
+        """
+        star = "\N{BLACK STAR}"
+        rating = ""
+        if self.continuous_dividend_increases is True:
+            rating = rating + star
+        if 2.0 <= self.dividend_yield <= 8.0:
+            rating = rating + star
+        if self.dividend_compound_annual_growth_rate >= 6.0:
+            rating = rating + star
+        if self.price_to_earnings_ratio <= 16.0:
+            rating = rating + star
+        if self.dividend_payout_ratio <= 60.0:
+            rating = rating + star
+        if self.debt_to_equity <= 60.0:
+            rating = rating + star
+        if self.discount >= 10.0:
+            rating = rating + star
+        return rating
 
 def get_statistics(ticker_symbol, time_periods=5):
     """
@@ -236,19 +327,22 @@ def compound_annual_growth_rate(ticker, n=5):
     return comp_annual_growth_rate
 
 
+
+
 def print_summary(stock):
     print(stock.name.strip() + " (" + stock.ticker + ")")
     print("    {} consecutive years of dividend increases: {}".format(stock.periods,
                                                                       str(stock.continuous_dividend_increases)))
-    print("    Stock's price: {}".format(stock.price))
+    print("    Stock's fair value: ${:.2f}".format(stock.graham_number))
+    print("    Stock's price: ${:.2f}".format(stock.price))
     print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield))
     print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods,
                                                                                                  stock.dividend_compound_annual_growth_rate))
-    print("    Price to Earnings ratio is less than 16: {}".format(stock.price_to_earnings_ratio))
+    print("    Price to Earnings ratio is less than 16: {:.2f}".format(stock.price_to_earnings_ratio))
     print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio))
-    print("    Debt to equity ratio is less than 60%: {}".format(stock.debt_to_equity))
-    print("    Price discount is at least 10% of fair value estimate: {}%".format(stock.discount))
-    # print("    Star Rating: {}".format(stock.rating))
+    print("    Debt to equity ratio is less than 60%: {:.2f}%".format(stock.debt_to_equity))
+    print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount))
+    print("    Star Rating: {}".format(stock.star_rating))
     print("%" * 80)
 
 

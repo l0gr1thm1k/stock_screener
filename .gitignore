@@ -4,3 +4,5 @@
 good_morning/__pycache__/
 
 utils/__pycache__/
+
+*.pyc
