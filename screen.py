@@ -19,15 +19,22 @@ class Stock:
     """
     a basic class to hold stock properties as objects.
     """
-    def __init__(self, ticker_symbol, periods=5):
+    def __init__(self, ticker_symbol, industry=None, periods=5):
+        
+        # Information to feed to data aggregators
         self.periods = periods
-        self.ticker = ticker_symbol
+        self.ticker = ticker_symbol.upper()
+        self.industry = industry
+
+        # Data aggregators
         self.frames, self.name = kr.download(self.ticker)
         self.financials = kf.download(self.ticker)
+        self.currency = self.financials['currency']
         self.returns = av.send_request("TIME_SERIES_DAILY", self.ticker)
         self.today = utils.get_today_str()
         self.nasdaq_statistics = parse_finance_page(self.ticker)
 
+        # Stock properties
         self.continuous_dividend_increases = self._continuous_dividend_increases()
         self.price = self._get_price()
         self.dividend_yield = self._get_dividend_yield()
@@ -93,7 +100,8 @@ class Stock:
         :return:
         """
         indices = [str(element.year) for element in self.frames[0].columns[-periods:]]
-        annualized_dividend_payments = [self.frames[0][index]['Dividends USD'] for index in indices]
+        key = "Dividends {}".format(self.currency)
+        annualized_dividend_payments = [self.frames[0][index][key] for index in indices]
 
         start_value = annualized_dividend_payments[0]
         end_value = annualized_dividend_payments[-1]
@@ -125,8 +133,8 @@ class Stock:
         """
 
         index = self.frames[0].columns[-1]
-        book_value_per_share = self.frames[0][index]['Book Value Per Share * USD']
-        earnings_per_share = self.frames[0][index]['Earnings Per Share USD']
+        book_value_per_share = self.frames[0][index]["Book Value Per Share * {}".format(self.currency)]
+        earnings_per_share = self.frames[0][index]["Earnings Per Share {}".format(self.currency)]
         graham_number = round(sqrt(24 * earnings_per_share * book_value_per_share), 2)
 
         return graham_number
@@ -137,17 +145,27 @@ class Stock:
         :return float: a percentage of discount rate. positive means there exists a discount, negative mean the
         equity is overpriced.
         """
-        return round(((self.graham_number / self.price) - 1) * 100, 2)
+        if self.graham_number > self.price:
+            # if underpriced
+            difference = self.graham_number - self.price
+            discount = round((difference / self.graham_number) * 100, 2)
+            return discount
+        else:
+            # if overpriced
+            difference = self.price - self.graham_number
+            discount = -round((difference / self.price) * 100, 2)
+        return discount
 
     def _get_debt_to_equity_ratio(self):
         """
 
         :return:
         """
-        index = str(self.frames[8].columns[-1].year)
-        equity = self.frames[8][index]["Total Stockholders' Equity"]
-        liabilities = self.frames[8][index]['Total Liabilities']
-        debt_to_equity_ratio = round(liabilities / equity, 2)
+        index = str(self.frames[9].columns[-1].year)
+        # equity = self.frames[8][index]["Total Stockholders' Equity"]
+        # liabilities = self.frames[8][index]['Total Liabilities']
+        # debt_to_equity_ratio = round(liabilities / equity, 2)
+        debt_to_equity_ratio = self.frames[9][index]['Debt/Equity']
         return debt_to_equity_ratio
 
     def _get_star_rating(self):
@@ -156,6 +174,7 @@ class Stock:
         :return:
         """
         star = "\N{BLACK STAR}"
+        empty_star = "\N{WHITE STAR}"
         rating = ""
         conditions = [self.continuous_dividend_increases is True,
                       2.0 <= self.dividend_yield <= 8.0,
@@ -167,6 +186,9 @@ class Stock:
         for condition in conditions:
             if condition:
                 rating = rating + star
+        num_empty_stars = 7 - len(rating)
+        empty_stars = empty_star * num_empty_stars
+        rating = rating + empty_stars
         return rating
 
 
@@ -179,24 +201,70 @@ def format_company_name(name):
     return name
 
 
+def print_msg(text: str, newline: bool = False) -> None:
+    """
+    Print a banner
+
+    :param text: text to print
+    :param newline: whether or not to print a newline before banner
+    """
+
+    if newline:
+        print()
+    print("% {: <117}%".format(text))
+    
+
+
+
 def print_summary(stock):
-    print(stock.name.strip() + " (" + stock.ticker + ")")
-    print("    {} consecutive years of dividend increases: {}".format(stock.periods,
-                                                                      str(stock.continuous_dividend_increases)))
-    print("    Stock's fair value: ${:.2f}".format(stock.graham_number))
-    print("    Stock's price: ${:.2f}".format(stock.price))
-    print("    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield))
-    print("    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods,
-                                                                                                 stock.dividend_compound_annual_growth_rate))
-    print("    Price to Earnings ratio is less than 16: {:.2f}".format(stock.price_to_earnings_ratio))
-    print("    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio))
-    print("    Debt to equity ratio is less than 0.60: {:.2f}".format(stock.debt_to_equity))
-    print("    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount))
-    print("    Star Rating: {}".format(stock.star_rating))
-    print("%" * 80)
+ 
+    msgs = [" ",
+            stock.name.strip() + " (" + stock.ticker + ")",
+            " ",
+            "    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_increases)),
+            "    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield),
+            "    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods,
+                                                                                                   stock.dividend_compound_annual_growth_rate),
+            "    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio),
+            " ",
+            "    Price to Earnings ratio is less than 16: {:.2f}".format(stock.price_to_earnings_ratio),
+            "    Debt to equity ratio is less than 0.60: {:.2f}".format(stock.debt_to_equity),
+            " ",
+            "    Stock's fair value: ${:.2f}".format(stock.graham_number),
+            "    Stock's price: ${:.2f}".format(stock.price),
+            "    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount),
+            " ",
+            "    Star Rating: {}".format(stock.star_rating),
+            " "]
+    if stock.industry is not None:
+        msgs.insert(3, "    Sector: {}".format(stock.industry))
+        msgs.insert(4, " ")
+        
+    print("%" * 120)
+    for msg in msgs:
+        print_msg(msg)
+    
+    print("%" * 120)
 
 
 if __name__ == "__main__":
+    '''
+    import sys
+    with open("watch_list.txt", "r") as f:
+        ticker_lists = [x.strip().split() for x in f.readlines()]
+    for ticker_list in ticker_lists:
+        for ticker in ticker_list:
+            print(ticker, file=sys.stderr)
+            try:
+                this_stock = Stock(ticker)
+                if len(this_stock.star_rating) >= 5:
+                    print_summary(this_stock)
+            except:
+                #print("Issue parsing {}".format(ticker))
+                #print("%" * 120)
+                pass
+    '''        
     ticker = sys.argv[1].upper().strip()
     this_stock = Stock(ticker)
     print_summary(this_stock)
+

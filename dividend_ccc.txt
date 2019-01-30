@@ -1,764 +1,864 @@
-SRCE	Banking
-MMM	Conglomerate
-AOS	Industrial Equipment
-AAN	Retail-Rental
-ABBV	Drugs
-ABM	Business Services
-ACN	Business Services
-ANCX	Banking
-ACU	Office Supplies
-ATVI	Technology-Software
-AES	Utility-Electric
-AFL	Insurance
-A	Medical Equipment
-AGU	Agricultural Chemicals
-APD	Chemical-Specialty
-AYR	Aircraft Leasing
-AIN	Textiles
-ALB	Chemical-Specialty
-ARE	REIT-Office
-ALE	Utility-Electric/Gas
-LNT	Utility-Electric/Gas
-AWH	Insurance
-ALL	Insurance
-AIMC	Industrial Equipment
-MO	Tobacco
-DOX	Technology-Software
-AAT	REIT-Retail
-AEP	Utility-Electric
-AEL	Insurance
-AXP	Financial Services
-AFG	Insurance
-AWR	Utility-Water
-AMT	REIT-Industrial
-AWK	Utility-Water
-APU	MLP-Propane
-AMP	Financial Services
-ABC	Drugs
-ATLO	Banking
-AMGN	Biotechnology
-APH	Telecomm Equipment
-AFSI	Financial Services
-ADI	Technology-Hardware
-ANDE	Agriculture
-BUD	Beverages-Alcoholic
-ANTM	Health Care Services
-AON	Insurance
-AIV	REIT-Residential
-APOG	Building Materials
-AAPL	Electronic Equipment
-AIT	Industrial Equipment
-ATR	Packaging
-WTR	Utility-Water
-ABR	REIT-Diversified
-ADM	Agriculture
-AMNF	Food Processing
-AROW	Banking
-ARTNA	Utility-Water
-AJG	Insurance
-ASH	Oil&Gas
-AHL	Insurance
-ASB	Banking
-AIZ	Insurance
-AGO	Insurance
-T	Telecommunications
-ATO	Utility-Gas
-ATNI	Telecommunications
-ATRI	Medical Instruments
-AUBN	Banking
-ALV	Auto Parts
-ADP	Business Services
-AVB	REIT-Residential
-AVY	Business Equipment
-AVA	Utility-Electric/Gas
-AVX	Electronics
-AXS	Insurance
-AZZ	Machinery
-BGS	Food Processing
-BMI	Industrial Equipment
-BCPC	Chemical-Specialty
-BANF	Banking
-BMRC	Banking
-BK	Banking
-BKSC	Banking
-OZRK	Banking
-BKUTK	Banking
-BHB	Banking
-B	Machinery
-BSET	Home Furnishings
-BBT	Banking
-BDX	Medical Instruments
-BMS	Packaging
-BBY	Retail-Electronic
-BBOX	Technology-Hardware
-BKH	Utility-Electric
-BLK	Financial Services
-BKEP	MLP-Oil&Gas Pipelines
-BOBE	Restaurants
-BA	Aerospace/Defense
-BOKF	Banking
-BAH	Management Services
-BRC	Business Services
-BGG	Machinery
-EAT	Restaurants
-BMY	Drugs
-AVGO	Technology-Hardware
-BR	Financial Services
-BAM	Financial Services
-BIP	MLP-Energy/Timber
-BRO	Insurance
-BF-B	Beverages-Alcoholic
-BMTC	Banking
-BT	Telecommunications
-BPL	MLP-Oil&Gas Pipelines
-BG	Agriculture
-CFFI	Banking
-CHRW	Transportation
-BCR	Medical Instruments
-CVGW	Food Wholesale
-CWT	Utility-Water
-CATC	Banking
-CPT	REIT-Residential
-CNI	Railroad
-CMN	Medical Devices
-CFNL	Banking
-CAH	Drugs
-CSL	Rubber and Plastics
-CASY	Retail-Grocery
-CASS	Business Services
-CAT	Industrial Equipment
-CBOE	Financial Services
-CBS	Media
-CCFN	Banking
-CEB	Management Services
-FUN	MLP-Amusement Parks
-CE	Chemical-Specialty
-CNP	Utility-Electric/Gas
-CCF	Protective Materials
-CLDT	REIT-Hotel/Motel
-CAKE	Restaurants
-CHE	Home Health Care
-CHFC	Banking
-CPKF	Banking
-CHSP	REIT-Lodging
-CPK	Utility-Gas
-CVX	Oil&Gas
-CHS	Restaurants
-CB	Insurance
-CHD	Consumer Products
-CHDN	Horse Racing
-CINF	Insurance
-CTAS	Business Services
-CSCO	Telecomm Equipment
-CZFS	Banking
-CHCO	Banking
-CIVB	Banking
-CLC	Auto Parts
-CLX	Cleaning Products
-CME	Financial Services
-CMS	Utility-Electric/Gas
-CNO	Insurance
-COBZ	Banking
-KO	Beverages-Non-alcoholic
-CVLY	Banking
-CCOI	Internet Services
-CNS	Financial Services
-CL	Personal Products
-CLNY	REIT-Diversified
-COLB	Banking
-COLM	Apparel
-CMCSA	Media
-CMA	Banking
-CBSH	Banking
-CMOH	Banking
-CBU	Banking
-CTBI	Banking
-CMP	Mining
-CSVI	Technology-Services
-CTWS	Utility-Water
-ED	Utility-Electric
-CVG	Business Services
-CORE	Food Wholesale
-COR	REIT-Office
-GLW	Technology-Hardware
-CXW	REIT-Diversified
-CLDB	Banking
-COST	Retail-Wholesale
-CBRL	Restaurants
-CSX	Railroad
-CUBE	REIT-Industrial
-CFR	Banking
-CFI	Textiles
-CMI	Machinery
-CVS	Retail-Drugstores
-DDR	REIT-Retail
-DGAS	Utility-Gas
-XRAY	Medical Equipment
-DRH	REIT-Hotel/Motel
-DLR	REIT-Industrial
-DDS	Department Stores
-DFS	Financial Services
-D	Utility-Electric/Gas
-UFS	Paper Products
-DCI	Industrial Equipment
-DGICA	Insurance
-DGICB	Insurance
-PLOW	Auto Parts
-DEI	REIT-Diversified
-DOV	Machinery
-DOW	Chemicals
-DPS	Beverages-Non-alcoholic
-DTE	Utility-Electric
-DUK	Utility-Electric/Gas
-DNB	Publishing
-DNKN	Restaurants
-DFT	REIT-Data Centers
-EBMT	Banking
-EFSI	Banking
-EGP	REIT-Industrial
-EMN	Chemicals-Diversified
-ETN	Machinery
-EV	Financial Services
-ECL	Cleaning Products
-EIX	Utility-Electric
-EDR	REIT-Education
-EE	Utility-Electric
-EMCI	Insurance
-EMCF	Banking
-EMR	Industrial Equipment
-EEP	MLP-Oil&Gas Pipelines
-ENB	Oil&Gas
-ENH	Insurance
-ETE	MLP-Natural Gas
-ENLC	Oil&Gas Services GP
-ENLK	MLP-Oil&Gas Services
-ENSG	Healthcare Facilities
-EBTC	Banking
-EPD	MLP-Pipelines/Services
-EPR	REIT-Retail
-EQM	MLP-Oil&Gas Pipelines
-EFX	Financial Services
-ELS	REIT-Residential
-ERIE	Insurance
-ESCA	Sporting Goods
-ESS	REIT-Apartment
-EL	Personal Products
-ETH	Home Furnishings
-EVBN	Banking
-EVR	Financial Services
-ES	Utility-Electric/Gas
-EXSR	Banking
-EXPE	Lodging
-EXPD	Transportation
-EXR	REIT-Industrial
-XOM	Oil&Gas
-FMBM	Banking
-FDS	Financial Services
-FMCB	Banking
-FMAO	Banking
-FBVA	Banking
-FAST	Building Materials
-FFG	Insurance
-AGM	Financial Services
-FRT	REIT-Shopping Centers
-FNHC	Insurance
-FDX	Transportation
-FNF	Insurance
-FINL	Retail-Apparel
-FAF	Insurance
-FCBC	Banking
-FDEF	Banking
-FFIN	Banking
-THFF	Banking
-FIBK	Banking
-FRME	Banking
-FMBH	Banking
-FLIC	Banking
-FRC	Banking
-FRFC	Banking
-FLXS	Home Furnishings
-FLIR	Scientific Instruments
-FLO	Food Processing
-FLS	Machinery
-FMC	Chemical-Diversified
-FNBG	Banking
-FL	Retail-Apparel
-FORR	Management Services
-FNV	Mining
-FELE	Industrial Equipment
-BEN	Financial Services
-GK	Business Services
-GME	Retail-Specialty
-GPS	Retail-Clothing
-GRMN	Scientific Instruments
-GATX	Rental/Leasing Services
-GD	Aerospace/Defense
-GGP	REIT-Retail
-GIS	Food Processing
-GEL	MLP-Oil&Gas Pipelines
-GNTX	Auto Parts
-GPC	Auto Parts
-GEO	REIT-Healthcare
-GIL	Apparel
-GBCI	Banking
-GAIN	BDC-Financial Services
-GNC	Retail-Drugstores
-GMLP	MLP-LNG Transport.
-GS	Financial Services
-GRC	Machinery
-GGG	Machinery
-GRRB	Banking
-GXP	Utility-Electric
-GFF	Building Materials
-GPI	Auto Dealerships
-FUL	Chemical-Specialty
-THG	Insurance
-HOG	Recreation
-HAR	Audio Products
-HRS	Telecomm Equipment
-HIG	Insurance
-HAS	Recreation
-HWKN	Chemical-Specialty
-HWBK	Banking
-HDB	Banking
-HCSG	Business Services
-HEI	Aerospace/Defense
-HP	Oil&Gas
-HFWA	Banking
-MLHR	Business Equipment
-HSY	Confectioner
-HI	Funeral Products
-HRC	Medical Instruments
-HIFS	Banking
-HNI	Business Equipment
-HEP	MLP-Oil&Gas Pipelines
-HFC	Oil&Gas
-HOMB	Banking
-HD	Retail-Home Improv.
-HONT	Banking
-HON	Industrial Equipment
-HOPE	Banking
-HMN	Insurance
-HBNC	Banking
-HRL	Food Processing
-HPT	REIT-Lodging
-HPQ	Technology-Hardware
-HUBB	Industrial Equipment
-HUM	Health Care Services
-HBAN	Banking
-HII	Aerospace/Defense
-HY	Lift Trucks
-IDA	Utility-Electric
-IEX	Machinery
-ITW	Machinery
-INDB	Banking
-IPCC	Insurance
-IR	Machinery
-INGR	Agriculture
-IMASF	Telecommunications
-NSP	Business Services
-IPAR	Consumer Goods
-TILE	Carpeting
-IBOC	Banking
-IBM	Technology-Hardware
-IFF	Food Processing
-IP	Packaging/Containers
-ISCA	Recreation
-INTU	Technology-Software
-IVZ	Financial Services
-ISBC	Banking
-IRM	REIT-Technology
-ISBA	Banking
-JJSF	Food Processing
-SJM	Food Processing
-JCOM	Internet Services
-JKHY	Business Services
-JNS	Financial Services
-JBHT	Transportation
-JW-A	Publishing
-JNJ	Drugs/Consumer Prod.
-JCI	Auto Parts
-JLL	Property Management
-JPM	Banking
-KALU	Aluminum
-KSU	Railroad
-KAR	Business Services
-K	Food Processing
-KMT	Machine Tools
-KW	Property Management
-KEY	Banking
-KMB	Personal Products
-KIM	REIT-Retail
-KINS	Insurance
-KLAC	Technology-Hardware
-KSS	Retail-Dept. Stores
-KR	Retail-Grocery
-LB	Apparel
-LLL	Aerospace/Defense
-LBAI	Banking
-LKFN	Banking
-LANC	Food/Consumer Prod.
-LARK	Banking
-LSTR	Transportation
-LVS	Resorts and Casinos
-LHO	REIT-Hotel/Motel
-LAZ	Financial Services
-LZB	Home Furnishings
-LEA	Auto Parts
-LTXB	Banking
-LM	Financial Services
-LEG	Furniture/Bldg. Prod.
-LMAT	Medical Instruments
-LII	Machinery
-LXP	REIT-Diversified
-LCUT	Housewares
-LMNR	Farm Products
-LECO	Machinery
-LNC	Insurance
-LNN	Farm Equipment
-LLTC	Technology-Hardware
-LAD	Auto Dealerships
-LFUS	Electronics
-LMT	Aerospace/Defense
-LOW	Retail-Home Improv.
-LTC	REIT-Health Care
-LYB	Chemical-Specialty
-LYBC	Banking
-MAC	REIT-Retail
-MIC	Storage Services
-M	Retail-Apparel
-MMP	MLP-Oil&Gas Pipelines
-MGA	Auto Parts
-MHLD	Insurance
-MAIN	BDC-Financial Services
-MSFG	Banking
-MLGF	Banking
-MAN	Staffing Services
-MPC	Oil&Gas
-MKTX	Financial Services
-MRLN	Financial Services
-MAR	Lodging
-MMC	Insurance
-MA	Financial Services
-MTRN	Metals & Materials
-MATW	Business Equipment
-MXIM	Technology-Hardware
-MBFI	Banking
-MKC	Food Processing
-MCD	Restaurants
-MGRC	Business Services
-MCK	Drugs
-MDU	Utility-Gas
-MJN	Consumer Products
-MDT	Medical Devices
-MBWM	Banking
-MRK	Drugs
-MCY	Insurance
-MDP	Publishing
-MEOH	Chemical-Specialty
-MGEE	Utility-Electric/Gas
-MCHP	Technology-Hardware
-MSFT	Technology-Software
-MAA	REIT-Residential
-MSEX	Utility-Water
-MOFG	Banking
-MLR	Auto Parts
-MDNB	Banking
-MKSI	Technology-Hardware
-TYPE	Technology-Software
-MNRO	Automotive
-MON	Agriculture
-MCO	Financial Services
-MORN	Technology-Software
-MSI	Telecomm Equipment
-MOV	Jewelry
-MSA	Medical/Safety Equip.
-MSM	Industrial Goods
-MYBF	Banking
-MYE	Rubber and Plastics
-NC	Machinery/Consumer
-NDAQ	Financial Services
-NKSH	Banking
-NFG	Utility-Gas
-NHI	REIT-Health Care
-NHC	Healthcare Facilities
-NNN	REIT-Retail
-NP	Paper Products
-NJR	Utility-Gas
-NEU	Chemical-Specialty
-NEE	Utility-Electric/Gas
-NKE	Apparel
-NI	Utility-Electric/Gas
-NDSN	Machinery
-NIDB	Banking
-NTRS	Banking
-NRIM	Banking
-NOC	Aerospace/Defense
-NWBI	Banking
-NWN	Utility-Gas
-NWE	Utility-Electric/Gas
-NWFL	Banking
-NUS	Personal Products
-NUE	Steel & Iron
-NVDA	Technology-Hardware
-OXY	Oil&Gas
-OGE	Utility-Electric/Gas
-ODC	Chemical-Specialty
-ONB	Banking
-ORI	Insurance
-OHI	REIT-Health Care
-OMC	Advertising
-OLP	REIT-Diversified
-OKE	Oil&Gas Equip/Svcs
-ORCL	Technology-Software
-OTCM	Financial Services
-OMI	Medical Equipment
-OXM	Apparel
-PCAR	Auto Parts
-PCBK	Banking
-PKG	Packaging/Containers
-PH	Industrial Equipment
-PDCO	Medical Equipment
-PAYX	Financial Services
-PAG	Auto Parts
-PNR	Industrial Equipment
-PPLL	Banking
-PBCT	Banking
-PEP	Beverages/Snack Food
-PRGO	Drugs
-PETS	Drugs-Animal
-PFE	Drugs
-PM	Tobacco
-PSX	Oil&Gas
-PIR	Retail-Specialty
-PPBN	Banking
-PNW	Utility-Electric
-PNBI	Banking
-PNC	Banking
-PNM	Utility-Electric
-PBSK	Banking
-PII	Recreation
-POL	Chemical-Specialty
-POOL	Pool Supplies
-POPE	MLP-Timber
-POR	Utility-Electric
-PPS	REIT-Residential
-PPG	Conglomerate
-PPL	Utility-Electric
-PX	Chemical-Specialty
-APTS	REIT-Residential
-PRI	Insurance
-PRIM	Construction
-PFG	Financial Services
-PG	Consumer Products
-PB	Banking
-PROV	Banking
-PFS	Banking
-PRU	Insurance
-PSBQ	Banking
-PEG	Utility-Electric/Gas
-PSA	REIT-Industrial
-QNBC	Banking
-QNTO	Banking
-KWR	Chemical-Specialty
-QCOM	Telecomm Equipment
-DGX	Medical Labs
-RL	Apparel
-RTN	Aerospace/Defense
-O	REIT-Retail Stores
-RBC	Electronics
-RGA	Insurance
-RS	Steel/Aluminum
-RNR	Insurance
-RBCAA	Banking
-RSG	Waste Management
-RMD	Medical Equipment
-RECN	Financial Services
-ROIC	REIT-Retail
-RAI	Tobacco
-RGCO	Utility-Gas
-RBA	Business Services
-RLI	Insurance
-RLJ	REIT-Hotel/Motel
-RHI	Business Services
-ROK	Machinery
-ROL	Business Services
-ROP	Industrial Equipment
-ROST	Retail-Apparel
-RCL	Resorts and Casinos
-RGLD	Mining
-RPM	Chemical-Specialty
-R	Transportation
-SPGI	Publishing
-SBRA	REIT-Health Care
-SASR	Banking
-SCG	Utility-Electric/Gas
-SLB	Oil&Gas Equip/Svcs
-SWM	Paper Products
-SMG	Chemical-Specialty
-SNI	Media
-STX	Technology-Hardware
-SSW	Containerships
-SEIC	Financial Services
-SIR	REIT-Office
-SRE	Utility-Gas
-SXT	Food Processing
-SCI	Funeral Services
-SHW	Paints
-SHPG	Drugs
-SCVL	Retail-Specialty
-SIG	Retail-Jewelry
-SLGN	Packaging
-SFNC	Banking
-SPG	REIT-Retail
-SBGI	Media
-SIX	Theme Parks
-SJW	Utility-Water
-SLG	REIT-Retail
-SNN	Medical Equipment
-SNA	Tools & Accesories
-SON	Packaging
-SOHO	REIT-Hotel/Motel
-SJI	Utility-Gas
-SSB	Banking
-SO	Utility-Electric
-SOMC	Banking
-SMBC	Banking
-SBSI	Banking
-LUV	Airline
-SWX	Utility-Gas
-SGB	Banking
-SPAN	Medical Equipment
-SPTN	Food Wholesale
-SE	Oil&Gas
-SEP	MLP-Oil&Gas Pipelines
-SR	Utility-Gas
-STJ	Medical Equipment
-STAG	REIT-Industrial
-SSI	Retail-Apparel
-SMP	Auto Parts
-SXI	Industrial Equipment
-SWK	Tools/Security Products
-SBUX	Restaurants
-STBZ	Banking
-STT	Banking
-STLD	Steel & Iron
-SCS	Furniture/Bldg. Prod.
-SCL	Cleaning Products
-STE	Medical Equipment
-SYBT	Banking
-STRT	Auto Parts
-SYK	Medical Devices
-SXL	MLP-Oil&Gas Pipelines
-SUN	MLP-Oil&Gas Services
-STI	Banking
-SYY	Food-Wholesale
-TROW	Financial Services
-SKT	REIT-Outlet Stores
-TRGP	Oil&Gas Services GP
-TGT	Retail-Discount
-TCP	MLP-Oil&Gas Pipelines
-AMTD	Financial Services
-TEL	Technology-Hardware
-TDS	Telecommunications
-TNC	Machinery
-TRNO	REIT-Industrial
-TBNK	Banking
-TSO	Oil&Gas
-TLLP	MLP-Oil&Gas Pipelines
-TXN	Technology-Hardware
-TPL	Real Estate Develop.
-TXRH	Restaurants
-THVB	Banking
-TRI	Media
-THO	Recreational Vehicles
-TIF	Retail-Jewelry
-TWX	Media
-TJX	Retail-Apparel
-TMP	Banking
-TR	Confectioner
-TMK	Insurance
-TTC	Tools & Accesories
-TOWN	Banking
-TSCO	Retail-Specialty
-TLP	MLP-Oil&Gas Pipelines
-TRV	Insurance
-TG	Rubber and Plastics
-TYBT	Banking
-TSN	Food Processing
-USB	Banking
-UDR	REIT-Residential
-UGI	Utility-Electric/Gas
-UMBF	Banking
-UMPQ	Banking
-UBSH	Banking
-UNP	Railroad
-UBOH	Banking
-UBSI	Banking
-UPS	Delivery & Freight
-UTX	Conglomerate
-UNH	Health Care Services
-UVV	Tobacco
-UHT	REIT-Health Care
-UNM	Insurance
-UBA	REIT-Shopping Centers
-USPH	Health Care Services
-UTMD	Medical Devices
-MTN	Resorts and Casinos
-VLO	Oil&Gas
-VAL	Paints
-VGR	Tobacco
-VVC	Utility-Electric/Gas
-VTR	REIT-Health Care
-VZ	Telecommunications
-VFC	Apparel
-V	Financial Services
-VSEC	Business Services
-WPC	REIT-Prop. Mgmt.
-WRB	Insurance
-GWW	Electronics-Wholesale
-WDR	Financial Services
-WBA	Retail-Drugstores
-WMT	Retail-Discount
-DIS	Entertainment
-WAFD	Banking
-WASH	Banking
-WCN	Waste Management
-WM	Waste Management
-WDFC	Chemical-Specialty
-WBS	Banking
-WRI	REIT-Retail
-WFC	Banking
-HCN	REIT-Health Care
-WEN	Restaurants
-WSBC	Banking
-WTBA	Banking
-WST	Medical Instruments
-WABC	Banking
-WR	Utility-Electric
-WDC	Technology-Hardware
-WES	MLP-Oil&Gas Pipelines
-WNR	Oil&Gas
-WAB	Transportation Services
-WLK	Chemical-Specialty
-WRK	Packaging
-WHG	Financial Services
-WEYS	Footwear
-WY	REIT-Lumber
-WGL	Utility-Gas
-WHR	Appliances
-WFM	Grocery Stores
-WMPN	Banking
-WSM	Retail-Home Products
-WLTW	Management Services
-WINA	Retail-Specialty
-WEC	Utility-Electric/Gas
-WOR	Steel & Iron
-WPPGY	Advertising
-WYN	Lodging
-XEL	Utility-Electric/Gas
-XLNX	Technology-Hardware
-XYL	Machinery
-YORW	Utility-Water
-YUM	Restaurants
-ZBH	Medical Devices
+SRCE	Financials
+MMM	Industrials
+AOS	Industrials
+AAN	Consumer Discretionary
+ABT	Health Care
+ABBV	Health Care
+ABM	Industrials
+AKR	Real Estate
+ACN	Information Technology
+ACU	Industrials
+ATVI	Communication Services
+WMS	Industrials
+AES	Utilities
+AFL	Financials
+AGCO	Industrials
+A	Health Care
+ADC	Real Estate
+AL	Industrials
+APD	Materials
+AYR	Industrials
+ALK	Industrials
+ALB	Materials
+ALX	Real Estate
+ARE	Real Estate
+ALLE	Industrials
+ALE	Utilities
+LNT	Utilities
+ALL	Financials
+AIMC	Industrials
+MO	Consumer Staples
+DOX	Information Technology
+AEE	Utilities
+AAT	Real Estate
+ACC	Real Estate
+AEP	Utilities
+AEL	Financials
+AXP	Financials
+AFG	Financials
+AWR	Utilities
+AMT	Real Estate
+AWK	Utilities
+APU	Utilities
+AMP	Financials
+AMSF	Financials
+ABC	Health Care
+ATLO	Financials
+AMGN	Health Care
+APH	Information Technology
+ADI	Information Technology
+ANDX	Energy
+ANDE	Consumer Staples
+ANTM	Health Care
+AON	Financials
+AIV	Real Estate
+APOG	Industrials
+APLO	Financials
+AAPL	Information Technology
+AIT	Industrials
+ATR	Materials
+WTR	Utilities
+ARMK	Consumer Discretionary
+ABR	Financials
+ADM	Consumer Staples
+ARGO	Financials
+AHH	Real Estate
+AMNF	Consumer Staples
+AROW	Financials
+ARTNA	Utilities
+AJG	Financials
+ASH	Materials
+ASB	Financials
+AIZ	Financials
+AGO	Financials
+T	Communication Services
+ATO	Utilities
+ATRI	Health Care
+AUBN	Financials
+ALV	Consumer Discretionary
+ADP	Information Technology
+AVB	Real Estate
+AVY	Materials
+AVA	Utilities
+AVT	Information Technology
+AVX	Information Technology
+AXS	Financials
+BGS	Consumer Staples
+BMI	Information Technology
+BCPC	Materials
+BANF	Financials
+BXS	Financials
+BAC	Financials
+BORT	Financials
+BMRC	Financials
+BK	Financials
+BKSC	Financials
+BKUTK	Financials
+OZK	Financials
+BFIN	Financials
+BANR	Financials
+BHB	Financials
+B	Industrials
+BSET	Consumer Discretionary
+BBT	Financials
+BDX	Health Care
+BMS	Materials
+BBY	Consumer Discretionary
+BIG	Consumer Discretionary
+BKH	Utilities
+BLK	Financials
+BA	Industrials
+BOKF	Financials
+BAH	Information Technology
+BWA	Consumer Discretionary
+BPFH	Financials
+BRC	Industrials
+EAT	Consumer Discretionary
+BMY	Health Care
+BRX	Real Estate
+AVGO	Information Technology
+BR	Information Technology
+BAM	Financials
+BIP	Utilities
+BPY	Real Estate
+BEP	Utilities
+BRO	Financials
+BF-B	Consumer Staples
+BC	Consumer Discretionary
+BMTC	Financials
+BT	Communication Services
+BG	Consumer Staples
+CFFI	Financials
+CHRW	Industrials
+CBT	Materials
+CVGW	Consumer Staples
+CWT	Utilities
+TYCB	Financials
+CATC	Financials
+CPT	Real Estate
+CNI	Industrials
+CMD	Health Care
+CCBG	Financials
+CAH	Health Care
+CTRE	Real Estate
+CSL	Industrials
+CARO	Financials
+CRI	Consumer Discretionary
+CASY	Consumer Staples
+CASS	Information Technology
+CAT	Industrials
+CATY	Financials
+CBOE	Financials
+CCFN	Financials
+CDW	Information Technology
+FUN	Consumer Discretionary
+CE	Materials
+CNP	Utilities
+CPF	Financials
+CCF	Materials
+CAKE	Consumer Discretionary
+CHE	Health Care
+CHFC	Financials
+CPKF	Financials
+CPK	Utilities
+CVX	Energy
+CHS	Consumer Discretionary
+PLCE	Consumer Discretionary
+CB	Financials
+CHD	Consumer Staples
+CHDN	Consumer Discretionary
+CINF	Financials
+CTAS	Industrials
+CSCO	Information Technology
+CZWI	Financials
+CFG	Financials
+CZFS	Financials
+CHCO	Financials
+CIVB	Financials
+CWEN	Utilities
+CLX	Consumer Staples
+CME	Financials
+CMS	Utilities
+CNO	Financials
+KO	Consumer Staples
+CVLY	Financials
+CCOI	Communication Services
+CNS	Financials
+CL	Consumer Staples
+COLB	Financials
+COLM	Consumer Discretionary
+CMCSA	Communication Services
+CMA	Financials
+FIX	Industrials
+CBSH	Financials
+CBU	Financials
+CTBI	Financials
+CWBC	Financials
+CSVI	Information Technology
+CTWS	Utilities
+ED	Utilities
+CTO	Real Estate
+CORE	Consumer Discretionary
+COR	Real Estate
+GLW	Information Technology
+CLDB	Financials
+COST	Consumer Staples
+CBRL	Consumer Discretionary
+CCI	Real Estate
+CSGS	Information Technology
+CSX	Industrials
+CUBE	Real Estate
+CFR	Financials
+CULP	Consumer Discretionary
+CMI	Industrials
+CONE	Real Estate
+DHI	Consumer Discretionary
+DHR	Health Care
+DKL	Energy
+DAL	Industrials
+XRAY	Health Care
+DHIL	Financials
+DLR	Real Estate
+DDS	Consumer Discretionary
+DFS	Financials
+DLB	Information Technology
+D	Utilities
+DPZ	Consumer Discretionary
+UFS	Materials
+DCI	Industrials
+DGICA	Financials
+DGICB	Financials
+PLOW	Industrials
+DEI	Real Estate
+DOV	Industrials
+DTE	Utilities
+DUK	Utilities
+DNB	Industrials
+DNKN	Consumer Discretionary
+EBMT	Financials
+EFSI	Financials
+EGP	Real Estate
+EMN	Materials
+ETN	Industrials
+EV	Financials
+ECL	Materials
+EIX	Utilities
+EE	Utilities
+EMCI	Financials
+EMCF	Financials
+EMR	Industrials
+ENB	Energy
+EHC	Health Care
+ET	Energy
+ENSG	Health Care
+EBTC	Financials
+EPD	Energy
+EVC	Communication Services
+EPR	Real Estate
+EQM	Energy
+ELS	Real Estate
+ERIE	Financials
+ESCA	Consumer Discretionary
+ESS	Real Estate
+EL	Consumer Staples
+EVBN	Financials
+EVR	Financials
+RE	Financials
+EVRG	Utilities
+ES	Utilities
+EXSR	Financials
+EXPE	Consumer Discretionary
+EXPD	Industrials
+EXPO	Industrials
+STAY	Consumer Discretionary
+EXR	Real Estate
+XOM	Energy
+FMBM	Financials
+FDS	Financials
+FMCB	Financials
+FMAO	Financials
+FBVA	Financials
+FAST	Industrials
+FFG	Financials
+AGM	Financials
+FRT	Real Estate
+FDX	Industrials
+FNF	Financials
+FITB	Financials
+FISI	Financials
+FAF	Financials
+FNLC	Financials
+BUSE	Financials
+FBIZ	Financials
+FCBC	Financials
+FCCO	Financials
+FDEF	Financials
+FFMR	Financials
+FFIN	Financials
+THFF	Financials
+FHN	Financials
+FR	Real Estate
+FIBK	Financials
+FRME	Financials
+FMBH	Financials
+FMBI	Financials
+FXNC	Financials
+FLIC	Financials
+FRC	Financials
+FSFG	Financials
+FLXS	Consumer Discretionary
+FLIR	Information Technology
+FLO	Consumer Staples
+FFIC	Financials
+FL	Consumer Discretionary
+FORR	Industrials
+FBHS	Industrials
+FNV	Materials
+FELE	Industrials
+BEN	Financials
+FSBW	Financials
+GLPI	Real Estate
+GLOP	Energy
+GATX	Industrials
+GD	Industrials
+GIS	Consumer Staples
+GNTX	Consumer Discretionary
+GPC	Consumer Discretionary
+GEO	Real Estate
+GABC	Financials
+GTY	Real Estate
+GIL	Consumer Discretionary
+GBCI	Financials
+GAIN	Financials
+GS	Financials
+GT	Consumer Discretionary
+GRC	Industrials
+GGG	Industrials
+GSBC	Financials
+GBX	Industrials
+GFF	Industrials
+GPI	Consumer Discretionary
+GBNK	Financials
+GFED	Financials
+FUL	Materials
+HAFC	Financials
+THG	Financials
+HOG	Consumer Discretionary
+HRS	Industrials
+HIG	Financials
+HAS	Consumer Discretionary
+HVT	Consumer Discretionary
+HVT-A	Consumer Discretionary
+HWKN	Materials
+HWBK	Financials
+HDB	Financials
+HCSG	Industrials
+HTA	Real Estate
+HLAN	Financials
+HEI	Industrials
+HP	Energy
+HNNA	Financials
+HTBK	Financials
+HFWA	Financials
+MLHR	Industrials
+HSY	Consumer Staples
+HI	Industrials
+HRC	Health Care
+HIFS	Financials
+HNI	Industrials
+HMLP	Energy
+HEP	Energy
+HBCP	Financials
+HOMB	Financials
+HD	Consumer Discretionary
+HFBL	Financials
+HONT	Financials
+HON	Industrials
+HOPE	Financials
+HMN	Financials
+HBNC	Financials
+HRL	Consumer Staples
+HPT	Real Estate
+HPQ	Information Technology
+HUBB	Industrials
+HUM	Health Care
+HBAN	Financials
+HII	Industrials
+HURC	Industrials
+HY	Industrials
+IDA	Utilities
+IEX	Industrials
+ITW	Industrials
+IHC	Financials
+INDB	Financials
+IBCP	Financials
+IBTX	Financials
+IR	Industrials
+INGR	Consumer Staples
+IOSP	Materials
+NSP	Industrials
+IPAR	Consumer Staples
+ICE	Financials
+IDCC	Information Technology
+TILE	Industrials
+IBOC	Financials
+IBM	Information Technology
+IFF	Materials
+IP	Materials
+ISCA	Consumer Discretionary
+IPG	Communication Services
+INTU	Information Technology
+IVZ	Financials
+ISTR	Financials
+ISBC	Financials
+IRM	Real Estate
+ISBA	Financials
+ITT	Industrials
+JJSF	Consumer Staples
+SJM	Consumer Staples
+JCOM	Information Technology
+JKHY	Information Technology
+JBHT	Industrials
+JW-A	Communication Services
+JNJ	Health Care
+JCI	Industrials
+JOUT	Consumer Discretionary
+JLL	Real Estate
+JPM	Financials
+KAI	Industrials
+KALU	Materials
+KSU	Industrials
+KAR	Industrials
+K	Consumer Staples
+KW	Real Estate
+KEQU	Health Care
+KEY	Financials
+KMB	Consumer Staples
+KIM	Real Estate
+KINS	Financials
+KRG	Real Estate
+KLAC	Information Technology
+KSS	Consumer Discretionary
+KHC	Consumer Staples
+KR	Consumer Staples
+LLL	Industrials
+LBAI	Financials
+LKFN	Financials
+LRCX	Information Technology
+LAMR	Real Estate
+LANC	Consumer Staples
+LARK	Financials
+LSTR	Industrials
+LVS	Consumer Discretionary
+LAZ	Financials
+LZB	Consumer Discretionary
+LEA	Consumer Discretionary
+LTXB	Financials
+LM	Financials
+LEG	Consumer Discretionary
+LMAT	Health Care
+LII	Industrials
+LXP	Real Estate
+LSI	Real Estate
+LMNR	Consumer Staples
+LECO	Industrials
+LNC	Financials
+LIN	Industrials
+LNN	Industrials
+LAD	Consumer Discretionary
+LFUS	Information Technology
+LMT	Industrials
+LOGN	Financials
+LOGI	Information Technology
+LOW	Consumer Discretionary
+LYB	Materials
+LYBC	Financials
+MCBC	Financials
+MAC	Real Estate
+MFNC	Financials
+MMP	Energy
+MGA	Consumer Discretionary
+MAIN	Financials
+MLGF	Financials
+LOAN	Financials
+MAN	Industrials
+MFC	Financials
+MPC	Energy
+MCS	Communication Services
+MKTX	Financials
+MNAT	Financials
+VAC	Consumer Discretionary
+MAR	Consumer Discretionary
+MMC	Financials
+MAS	Industrials
+MA	Information Technology
+MTRN	Materials
+MATX	Industrials
+MATW	Industrials
+MXIM	Information Technology
+MBFI	Financials
+MKC	Consumer Staples
+MCD	Consumer Discretionary
+MGRC	Industrials
+MCK	Health Care
+MDU	Utilities
+MPW	Real Estate
+MDT	Health Care
+MBWM	Financials
+MRK	Health Care
+MCY	Financials
+MDP	Communication Services
+MEOH	Materials
+MET	Financials
+MGEE	Utilities
+MCHP	Information Technology
+MSFT	Information Technology
+MPB	Financials
+MAA	Real Estate
+MSEX	Utilities
+MOFG	Financials
+MKSI	Information Technology
+MINI	Industrials
+MC	Financials
+MDLZ	Consumer Staples
+TYPE	Information Technology
+MNRO	Consumer Discretionary
+MCO	Financials
+MS	Financials
+MORN	Financials
+MSI	Information Technology
+MPLX	Energy
+MSA	Industrials
+MSM	Industrials
+MSCI	Financials
+MYBF	Financials
+MFSF	Financials
+NC	Energy
+NASB	Financials
+NDAQ	Financials
+NKSH	Financials
+NFG	Utilities
+NHI	Real Estate
+NHC	Health Care
+NATI	Information Technology
+NNN	Real Estate
+NHTC	Consumer Staples
+NBTB	Financials
+NP	Materials
+NTAP	Information Technology
+NJR	Utilities
+NEWM	Communication Services
+NRZ	Financials
+NEU	Materials
+NXST	Communication Services
+NEE	Utilities
+NEP	Utilities
+NLSN	Industrials
+NKE	Consumer Discretionary
+NI	Utilities
+NDSN	Industrials
+NIDB	Financials
+NTRS	Financials
+NFBK	Financials
+NRIM	Financials
+NOC	Industrials
+NWBI	Financials
+NWN	Utilities
+NWE	Utilities
+NWFL	Financials
+NUS	Consumer Staples
+NUE	Materials
+NVDA	Information Technology
+OVLY	Financials
+OXY	Energy
+OCFC	Financials
+OGE	Utilities
+ODC	Consumer Staples
+OLBK	Financials
+ORI	Financials
+OHI	Real Estate
+OMC	Communication Services
+OGS	Utilities
+OLP	Real Estate
+OKE	Energy
+OTEX	Information Technology
+ORCL	Information Technology
+OSK	Industrials
+OTTR	Utilities
+OC	Industrials
+ORM	Financials
+OXM	Consumer Discretionary
+GLT	Materials
+PCAR	Industrials
+PKG	Materials
+PZZA	Consumer Discretionary
+PKBK	Financials
+PH	Industrials
+PEGI	Utilities
+PDCO	Health Care
+PAYX	Information Technology
+PBFX	Energy
+PAG	Consumer Discretionary
+PNR	Industrials
+PEBK	Financials
+PPLL	Financials
+PBCT	Financials
+PEP	Consumer Staples
+PRGO	Health Care
+PETS	Consumer Discretionary
+PFE	Health Care
+PM	Consumer Staples
+PSX	Energy
+PSXP	Energy
+PPBN	Financials
+PNW	Utilities
+PNBI	Financials
+PNC	Financials
+PNM	Utilities
+PII	Consumer Discretionary
+POL	Materials
+POOL	Consumer Discretionary
+POR	Utilities
+PTBS	Financials
+POWI	Information Technology
+PPG	Materials
+PPL	Utilities
+APTS	Real Estate
+PFBC	Financials
+PRI	Financials
+PRIM	Industrials
+PFG	Financials
+PG	Consumer Staples
+PLD	Real Estate
+PB	Financials
+PROV	Financials
+PFS	Financials
+PRU	Financials
+PSB	Real Estate
+PSBQ	Financials
+PEG	Utilities
+QNBC	Financials
+QTS	Real Estate
+QNTO	Financials
+KWR	Materials
+QCOM	Information Technology
+DGX	Health Care
+RJF	Financials
+RTN	Industrials
+RMAX	Real Estate
+O	Real Estate
+RBC	Industrials
+REG	Real Estate
+RF	Financials
+RGA	Financials
+RS	Materials
+RNR	Financials
+RBCAA	Financials
+RSG	Industrials
+RMD	Health Care
+RECN	Industrials
+ROIC	Real Estate
+REXR	Real Estate
+RGCO	Utilities
+RBA	Industrials
+RLI	Financials
+RHI	Industrials
+ROK	Industrials
+ROL	Industrials
+ROP	Industrials
+ROST	Consumer Discretionary
+RCL	Consumer Discretionary
+RGLD	Materials
+RPM	Materials
+RUTH	Consumer Discretionary
+R	Industrials
+RHP	Real Estate
+SPGI	Financials
+STBA	Financials
+SBRA	Real Estate
+SAFM	Consumer Staples
+SASR	Financials
+BFS	Real Estate
+SBFG	Financials
+SWM	Materials
+SMG	Materials
+SEIC	Financials
+SIGI	Financials
+SRE	Utilities
+SXT	Materials
+SCI	Consumer Discretionary
+SFBS	Financials
+SHEN	Communication Services
+SHW	Materials
+SHPG	Health Care
+SCVL	Consumer Discretionary
+BSRR	Financials
+SIG	Consumer Discretionary
+SLGN	Materials
+SFNC	Financials
+SPG	Real Estate
+SSD	Industrials
+SBGI	Communication Services
+SIX	Consumer Discretionary
+SJW	Utilities
+SWKS	Information Technology
+SLG	Real Estate
+SNA	Industrials
+SON	Materials
+SOHO	Real Estate
+SFBC	Financials
+SJI	Utilities
+SSB	Financials
+SO	Utilities
+SOMC	Financials
+SMBC	Financials
+SBSI	Financials
+LUV	Industrials
+SWX	Utilities
+SGB	Financials
+SPTN	Consumer Staples
+SR	Utilities
+SRLP	Energy
+STAG	Real Estate
+SMP	Consumer Discretionary
+SXI	Industrials
+SWK	Industrials
+SGU	Utilities
+SBUX	Consumer Discretionary
+STT	Financials
+STLD	Materials
+SCS	Industrials
+SCL	Materials
+STE	Health Care
+SYBT	Financials
+SYK	Health Care
+STBI	Financials
+INN	Real Estate
+STI	Financials
+SGC	Consumer Discretionary
+SNX	Information Technology
+SNV	Financials
+SYY	Consumer Staples
+TROW	Financials
+SKT	Real Estate
+TGT	Consumer Discretionary
+TCO	Real Estate
+AMTD	Financials
+TEL	Information Technology
+TDS	Communication Services
+TNC	Industrials
+TEX	Industrials
+TRNO	Real Estate
+TBNK	Financials
+TTEK	Industrials
+TXN	Information Technology
+TPL	Energy
+TXRH	Consumer Discretionary
+TFSL	Financials
+HCKT	Information Technology
+THVB	Financials
+TRI	Financials
+THO	Consumer Discretionary
+TIF	Consumer Discretionary
+TSBK	Financials
+TKR	Industrials
+TJX	Consumer Discretionary
+TMP	Financials
+TR	Consumer Staples
+TMK	Financials
+TTC	Industrials
+TOWN	Financials
+TSCO	Consumer Discretionary
+TLP	Energy
+TRV	Financials
+TCBK	Financials
+TYBT	Financials
+TRN	Industrials
+TRUX	Financials
+TRCB	Financials
+TSN	Consumer Staples
+USB	Financials
+UDR	Real Estate
+UGI	Utilities
+UMBF	Financials
+UMPQ	Financials
+UBSH	Financials
+UNB	Financials
+UNP	Industrials
+UBCP	Financials
+UBSI	Financials
+UCBI	Financials
+UCFC	Financials
+UFCS	Financials
+UPS	Industrials
+UTX	Industrials
+UNH	Health Care
+UNTY	Financials
+UVV	Consumer Staples
+UFPI	Industrials
+UHT	Real Estate
+UNM	Financials
+UBA	Real Estate
+USPH	Health Care
+UTMD	Health Care
+MTN	Consumer Discretionary
+VLO	Energy
+VLP	Energy
+VGR	Consumer Staples
+VVC	Utilities
+VTR	Real Estate
+VZ	Communication Services
+VFC	Consumer Discretionary
+V	Information Technology
+VSEC	Industrials
+VMC	Materials
+WPC	Real Estate
+WRB	Financials
+WTBFA	Financials
+GWW	Industrials
+WBA	Consumer Staples
+WMT	Consumer Staples
+DIS	Communication Services
+WAFD	Financials
+WASH	Financials
+WCN	Industrials
+WM	Industrials
+WSO	Industrials
+WTS	Industrials
+WDFC	Consumer Staples
+WBS	Financials
+WEC	Utilities
+WRI	Real Estate
+WEBK	Financials
+WFC	Financials
+WEN	Consumer Discretionary
+WSBC	Financials
+WTBA	Financials
+WST	Health Care
+WABC	Financials
+WGP	Energy
+WES	Energy
+WAB	Industrials
+WLK	Materials
+WLKP	Materials
+WRK	Materials
+WHG	Financials
+WEYS	Consumer Discretionary
+WY	Real Estate
+WHR	Consumer Discretionary
+WMPN	Financials
+WSM	Consumer Discretionary
+WLTW	Financials
+WINA	Consumer Discretionary
+WTFC	Financials
+WDFN	Financials
+WOR	Materials
+WPP	Communication Services
+WSFS	Financials
+WYND	Consumer Discretionary
+XEL	Utilities
+XLNX	Information Technology
+XYL	Industrials
+YORW	Utilities
+ZION	Financials
+ZTS	Health Care
