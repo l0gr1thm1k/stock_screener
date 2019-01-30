@@ -3,11 +3,11 @@
 import re
 import sys
 
-from alpha_vantage.alpha_vantage import AlphaVantage
-from good_morning.good_morning import KeyRatiosDownloader, FinancialsDownloader
-from nasdaq.nasdaq_scrape import parse_finance_page
+from .alpha_vantage.alpha_vantage import AlphaVantage
+from .good_morning.good_morning import KeyRatiosDownloader, FinancialsDownloader
+from .nasdaq.nasdaq_scrape import parse_finance_page
 from numpy import sqrt
-from utils import utils
+from .utils import utils
 
 
 kr = KeyRatiosDownloader()

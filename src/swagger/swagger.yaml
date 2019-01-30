@@ -1,0 +1,124 @@
+---
+swagger: "2.0"
+info:
+  description: "Screen stocks"
+  version: "1.0.0"
+  title: "Stock Screener"
+  contact:
+    email: "l0gr1thm1k@gmail.com"
+produces:
+- "application/json"
+paths:
+  /screen:
+    post:
+      tags:
+      - "Screening"
+      summary: "Take an input ticker string and get back current stock info"
+      description: "Get back a list of stock properties."
+      operationId: "post_screen"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ticker"
+        required: true
+        schema:
+          $ref: "#/definitions/InputText"
+      responses:
+        200:
+          description: "stock properties list"
+          schema:
+            $ref: "#/definitions/ResponseObject"
+      x-swagger-router-controller: "controllers.screening"
+  /healthcheck:
+    get:
+      tags:
+      - "Status"
+      summary: "Healthcheck"
+      description: "Healthcheck operation used by the load balancer."
+      operationId: "get_healthcheck"
+      parameters: []
+      responses:
+        200:
+          description: "Healthy"
+      x-swagger-router-controller: "controllers.status"
+definitions:
+  InputText:
+    properties:
+      ticker:
+        type: "string"
+        example: "XOM"
+  ResponseObject:
+    properties:
+      companyName:
+        type: "string"
+        example: "Exxon Mobil Corp"
+        description: "Company name"
+      companyTicker:
+        type: "string"
+        example: "XOM"
+        description: "company ticker"
+      debtToEquityRatio:
+        type: "number"
+        format: "float"
+        example: 0.11
+        description: "Ratio of company's debt to equity"
+      dividendCAGR:
+        type: "number"
+        format: "float"
+        example: 0.0333
+        description: "The annualized dividend's compound growth rate"
+      dividendIncrease:
+        type: "boolean"
+        example: true
+        description: "Stock continuously increased dividend for 5 years"
+      dividendPayoutRatio:
+        type: "number"
+        format: "float"
+        example: 0.585
+        description: "Annualized dividend divided by earnings per share"
+      dividendYield:
+        type: "number"
+        format: "float"
+        example: 0.046
+        description: "Current dividend yield"
+      priceToEarningsRatio:
+        type: "number"
+        format: "float"
+        example: 13.2
+        description: "Share price divided by earnings per share"
+      starRating:
+        type: "string"
+        example: "★★★★★☆☆"
+        description: "Stock's star rating out of seven stars"
+      stockDiscount:
+        type: "number"
+        format: "float"
+        description: "Percentage discount of current price from fair value estimate"
+      stockFairValue:
+        type: "number"
+        format: "float"
+        example: 76.62
+        description: "Stock's fair value estimated using the Graham number"
+      stockPrice:
+        type: "number"
+        format: "float"
+        example: 71.59
+        description: "Stock's price at end of last business day"
+    example:
+      debtToEquityRatio: 0.11
+      dividendIncrease: true
+      stockFairValue: 76.62
+      companyTicker: "XOM"
+      dividendCAGR: 0.0333
+      companyName: "Exxon Mobil Corp"
+      dividendPayoutRatio: 0.585
+      starRating: "★★★★★☆☆"
+      priceToEarningsRatio: 13.2
+      stockPrice: 71.59
+      dividendYield: 0.046
+      stockDiscount: 0.8008282
+  Error:
+    properties:
+      message:
+        type: "string"

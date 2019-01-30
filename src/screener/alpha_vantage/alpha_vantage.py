@@ -19,7 +19,7 @@ class AlphaVantage:
         :return user: Return the username whose API key we will use when calling AlphaVantage.
         :return key: Return the API key to access financial information from AlphaVantage.
         """
-        info = open("alpha_vantage/credentials.txt", "r").readlines()
+        info = open("screener/alpha_vantage/credentials.txt", "r").readlines()
         user = info[0].split("=")[1].strip()
         key = info[1].split("=")[1].strip()
         return user, key
