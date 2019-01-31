@@ -4,8 +4,6 @@
 from lxml import html
 import requests
 from time import sleep
-import json
-import argparse
 import warnings
 from random import randint
 

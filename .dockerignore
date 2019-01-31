@@ -1,0 +1,16 @@
+.cache/
+.coverage
+.idea/
+*.pyc
+htmlcov/**
+.pytest_cache/
+src/tests/
+
+# Virtualenv
+local/
+
+# Model files
+src/data/*
+
+# Metrics
+src/metrics/*

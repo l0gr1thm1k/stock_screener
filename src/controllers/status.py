@@ -1,8 +1,3 @@
-import connexion
-import six
-
-from src import util
-
 
 def get_healthcheck():  # noqa: E501
     """Healthcheck
