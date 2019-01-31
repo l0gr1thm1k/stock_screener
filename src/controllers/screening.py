@@ -1,8 +1,6 @@
 import connexion
 
 from screener.screen import Stock
-from src.models.input_text import InputText  # noqa: E501
-from src.models.response_object import ResponseObject  # noqa: E501
 
 
 def post_screen(ticker):  # noqa: E501
@@ -15,8 +13,6 @@ def post_screen(ticker):  # noqa: E501
 
     :rtype: ResponseObject
     """
-    #if connexion.request.is_json:
-    #    ticker = InputText.from_dict(connexion.request.get_json())  # noqa: E501
     company_ticker = ticker['ticker'].upper()
 
     stock = Stock(company_ticker)

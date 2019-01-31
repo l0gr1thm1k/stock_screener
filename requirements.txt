@@ -2,7 +2,9 @@ beautifulsoup4==4.5.3
 connexion[swagger-ui]==2.1.0
 flask==1.0.2
 gunicorn==19.9.0
+lxml==4.2.4
 numpy==1.15.1
 pandas==0.23.4
+prometheus_client==0.3.1
 pymysql==0.9.2
 tabulate==0.8.2
