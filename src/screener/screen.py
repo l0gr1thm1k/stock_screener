@@ -6,7 +6,7 @@ import sys
 from .alpha_vantage.alpha_vantage import AlphaVantage
 from .good_morning.good_morning import KeyRatiosDownloader, FinancialsDownloader
 from .nasdaq.nasdaq_scrape import parse_finance_page
-from numpy import sqrt
+from numpy import sqrt, nan
 from .utils import utils
 
 
@@ -35,9 +35,9 @@ class Stock:
         self.nasdaq_statistics = parse_finance_page(self.ticker)
 
         # Stock properties
+        self.dividend_yield = self._get_dividend_yield()
         self.continuous_dividend_increases = self._continuous_dividend_increases()
         self.price = self._get_price()
-        self.dividend_yield = self._get_dividend_yield()
         self.price_to_earnings_ratio = self._get_price_to_earnings_ratio()
         self.dividend_compound_annual_growth_rate = self._get_dividend_compound_annual_growth_rate(self.periods)
         self.dividend_payout_ratio = self._get_dividends_to_eps_ratio()
@@ -51,14 +51,17 @@ class Stock:
 
         :return:
         """
-        yields = self.frames[0].iloc[6][-self.periods:]
-        present_yield = 0.0
-        for i in yields:
-            if i > present_yield:
-                present_yield = i
-            else:
-                return False
-        return True
+        try:
+            yields = self.frames[0].iloc[6][-self.periods:]
+            present_yield = 0.0
+            for i in yields:
+                if i > present_yield:
+                    present_yield = i
+                else:
+                    return False
+            return True
+        except:
+            return False
 
     def _get_price(self):
         """
@@ -72,6 +75,8 @@ class Stock:
             # last_business_day = utils.get_most_recent_date(list(self.returns['Time Series (Daily)'].keys()))
             last_business_day = list(self.returns['Time Series (Daily)'].keys())[0]
             price = float(self.returns['Time Series (Daily)'][last_business_day]['4. close'])
+        # price = self.nasdaq_statistics['key_stock_data']['Previous Close']
+        # price = float(price[2:])
 
         return round(price, 2)
 
@@ -81,8 +86,13 @@ class Stock:
 
         :return:
         """
-        div_yield = self.nasdaq_statistics['key_stock_data']['Current Yield']
-        div_yield = float(re.findall('\d+\.\d*', div_yield)[0])
+        try:
+            div_yield = self.nasdaq_statistics['key_stock_data']['Current Yield']
+            div_yield = float(re.findall('\d+\.\d*', div_yield)[0]) / 100
+        except KeyError:
+            div_yield = 0.0
+        except IndexError:
+            div_yield = 0.0
         return div_yield
 
     def _get_price_to_earnings_ratio(self):
@@ -90,7 +100,10 @@ class Stock:
 
         :return:
         """
-        pe_ratio = float(self.nasdaq_statistics['key_stock_data']['P/E Ratio'])
+        try:
+            pe_ratio = float(self.nasdaq_statistics['key_stock_data']['P/E Ratio'])
+        except KeyError:
+            pe_ratio = nan
         return pe_ratio
 
     def _get_dividend_compound_annual_growth_rate(self, periods):
@@ -99,22 +112,28 @@ class Stock:
         :param periods:
         :return:
         """
-        indices = [str(element.year) for element in self.frames[0].columns[-periods:]]
-        key = "Dividends {}".format(self.currency)
-        annualized_dividend_payments = [self.frames[0][index][key] for index in indices]
+        try:
+            indices = [str(element.year) for element in self.frames[0].columns[-periods:]]
+            key = "Dividends {}".format(self.currency)
+            annualized_dividend_payments = [self.frames[0][index][key] for index in indices]
 
-        start_value = annualized_dividend_payments[0]
-        end_value = annualized_dividend_payments[-1]
-        growth_rate = ((end_value / start_value) ** (1 / periods) - 1) * 100
-        return round(growth_rate, 2)
+            start_value = annualized_dividend_payments[0]
+            end_value = annualized_dividend_payments[-1]
+            growth_rate = ((end_value / start_value) ** (1 / periods) - 1)
+            return round(growth_rate, 4)
+        except KeyError:
+            return 0.0
 
     def _get_dividends_to_eps_ratio(self):
         """
 
         :return:
         """
-        index = str(self.frames[0].columns[-1].year)
-        payout_ratio = self.frames[0][index]['Payout Ratio % *']
+        try:
+            index = str(self.frames[0].columns[-1].year)
+            payout_ratio = self.frames[0][index]['Payout Ratio % *'] / 100
+        except KeyError:
+            payout_ratio = nan
         return payout_ratio
 
     def _get_graham_number(self):
@@ -148,12 +167,12 @@ class Stock:
         if self.graham_number > self.price:
             # if underpriced
             difference = self.graham_number - self.price
-            discount = round((difference / self.graham_number) * 100, 2)
+            discount = round((difference / self.graham_number), 4)
             return discount
         else:
             # if overpriced
             difference = self.price - self.graham_number
-            discount = -round((difference / self.price) * 100, 2)
+            discount = -round((difference / self.price), 4)
         return discount
 
     def _get_debt_to_equity_ratio(self):
@@ -162,9 +181,6 @@ class Stock:
         :return:
         """
         index = str(self.frames[9].columns[-1].year)
-        # equity = self.frames[8][index]["Total Stockholders' Equity"]
-        # liabilities = self.frames[8][index]['Total Liabilities']
-        # debt_to_equity_ratio = round(liabilities / equity, 2)
         debt_to_equity_ratio = self.frames[9][index]['Debt/Equity']
         return debt_to_equity_ratio
 
@@ -177,14 +193,14 @@ class Stock:
         empty_star = "\N{WHITE STAR}"
         rating = ""
         conditions = [self.continuous_dividend_increases is True,
-                      2.0 <= self.dividend_yield <= 8.0,
-                      self.dividend_compound_annual_growth_rate >= 6.0,
+                      0.02 <= self.dividend_yield <= 0.08,
+                      self.dividend_compound_annual_growth_rate >= 0.06,
                       self.price_to_earnings_ratio <= 16.0,
-                      self.dividend_payout_ratio <= 60.0,
+                      self.dividend_payout_ratio <= 0.6,
                       self.debt_to_equity <= 0.6,
-                      self.discount >= 10.0]
+                      self.discount >= 0.1]
         for condition in conditions:
-            if condition:
+            if condition is not nan and condition:
                 rating = rating + star
         num_empty_stars = 7 - len(rating)
         empty_stars = empty_star * num_empty_stars

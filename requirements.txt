@@ -6,5 +6,8 @@ lxml==4.2.4
 numpy==1.15.1
 pandas==0.23.4
 prometheus_client==0.3.1
+pyhocon==0.3.35
 pymysql==0.9.2
+python-json-logger==0.1.9
+structlog==18.1.0
 tabulate==0.8.2
