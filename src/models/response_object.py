@@ -15,7 +15,7 @@ class ResponseObject(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, company_name: str=None, company_ticker: str=None, debt_to_equity_ratio: float=None, dividend_cagr: float=None, dividend_increase: bool=None, dividend_payout_ratio: float=None, dividend_yield: float=None, price_to_earnings_ratio: float=None, star_rating: str=None, stock_discount: float=None, stock_fair_value: float=None, stock_price: float=None):  # noqa: E501
+    def __init__(self, company_name: str=None, company_ticker: str=None, debt_to_equity_ratio: float=None, dividend_cagr: object=None, dividend_increase: bool=None, dividend_payout_ratio: object=None, dividend_yield: float=None, price_to_earnings_ratio: float=None, star_rating: str=None, stock_discount: float=None, stock_fair_value: float=None, stock_price: float=None):  # noqa: E501
         """ResponseObject - a model defined in Swagger
 
         :param company_name: The company_name of this ResponseObject.  # noqa: E501
@@ -25,11 +25,11 @@ class ResponseObject(Model):
         :param debt_to_equity_ratio: The debt_to_equity_ratio of this ResponseObject.  # noqa: E501
         :type debt_to_equity_ratio: float
         :param dividend_cagr: The dividend_cagr of this ResponseObject.  # noqa: E501
-        :type dividend_cagr: float
+        :type dividend_cagr: object
         :param dividend_increase: The dividend_increase of this ResponseObject.  # noqa: E501
         :type dividend_increase: bool
         :param dividend_payout_ratio: The dividend_payout_ratio of this ResponseObject.  # noqa: E501
-        :type dividend_payout_ratio: float
+        :type dividend_payout_ratio: object
         :param dividend_yield: The dividend_yield of this ResponseObject.  # noqa: E501
         :type dividend_yield: float
         :param price_to_earnings_ratio: The price_to_earnings_ratio of this ResponseObject.  # noqa: E501
@@ -47,9 +47,9 @@ class ResponseObject(Model):
             'company_name': str,
             'company_ticker': str,
             'debt_to_equity_ratio': float,
-            'dividend_cagr': float,
+            'dividend_cagr': object,
             'dividend_increase': bool,
-            'dividend_payout_ratio': float,
+            'dividend_payout_ratio': object,
             'dividend_yield': float,
             'price_to_earnings_ratio': float,
             'star_rating': str,
@@ -167,24 +167,24 @@ class ResponseObject(Model):
         self._debt_to_equity_ratio = debt_to_equity_ratio
 
     @property
-    def dividend_cagr(self) -> float:
+    def dividend_cagr(self) -> object:
         """Gets the dividend_cagr of this ResponseObject.
 
         The annualized dividend's compound growth rate  # noqa: E501
 
         :return: The dividend_cagr of this ResponseObject.
-        :rtype: float
+        :rtype: object
         """
         return self._dividend_cagr
 
     @dividend_cagr.setter
-    def dividend_cagr(self, dividend_cagr: float):
+    def dividend_cagr(self, dividend_cagr: object):
         """Sets the dividend_cagr of this ResponseObject.
 
         The annualized dividend's compound growth rate  # noqa: E501
 
         :param dividend_cagr: The dividend_cagr of this ResponseObject.
-        :type dividend_cagr: float
+        :type dividend_cagr: object
         """
 
         self._dividend_cagr = dividend_cagr
@@ -213,24 +213,24 @@ class ResponseObject(Model):
         self._dividend_increase = dividend_increase
 
     @property
-    def dividend_payout_ratio(self) -> float:
+    def dividend_payout_ratio(self) -> object:
         """Gets the dividend_payout_ratio of this ResponseObject.
 
         Annualized dividend divided by earnings per share  # noqa: E501
 
         :return: The dividend_payout_ratio of this ResponseObject.
-        :rtype: float
+        :rtype: object
         """
         return self._dividend_payout_ratio
 
     @dividend_payout_ratio.setter
-    def dividend_payout_ratio(self, dividend_payout_ratio: float):
+    def dividend_payout_ratio(self, dividend_payout_ratio: object):
         """Sets the dividend_payout_ratio of this ResponseObject.
 
         Annualized dividend divided by earnings per share  # noqa: E501
 
         :param dividend_payout_ratio: The dividend_payout_ratio of this ResponseObject.
-        :type dividend_payout_ratio: float
+        :type dividend_payout_ratio: object
         """
 
         self._dividend_payout_ratio = dividend_payout_ratio

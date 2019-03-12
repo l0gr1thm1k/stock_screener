@@ -52,16 +52,14 @@ class Stock:
         :return:
         """
         try:
-            yields = self.frames[0].iloc[6][-self.periods:]
-            present_yield = 0.0
-            for i in yields:
-                if i > present_yield:
-                    present_yield = i
-                else:
-                    return False
-            return True
+            yields = [i for i in self.frames[0].iloc[6][-self.periods:]]
         except:
             return False
+        if sorted(yields) == yields:
+            return True
+        else:
+            return False
+
 
     def _get_price(self):
         """
@@ -101,9 +99,12 @@ class Stock:
         :return:
         """
         try:
-            pe_ratio = float(self.nasdaq_statistics['key_stock_data']['P/E Ratio'])
+            stat = self.nasdaq_statistics['key_stock_data']['P/E Ratio']
+            stat = re.sub(",", "", stat)
+            
+            pe_ratio = float(stat)
         except KeyError:
-            pe_ratio = nan
+            pe_ratio = 0.0  # should be NaN
         return pe_ratio
 
     def _get_dividend_compound_annual_growth_rate(self, periods):
@@ -116,12 +117,19 @@ class Stock:
             indices = [str(element.year) for element in self.frames[0].columns[-periods:]]
             key = "Dividends {}".format(self.currency)
             annualized_dividend_payments = [self.frames[0][index][key] for index in indices]
+            
+            if sum(annualized_dividend_payments) > 0:
+                pass
+            else:
+                return 0.0
 
             start_value = annualized_dividend_payments[0]
             end_value = annualized_dividend_payments[-1]
             growth_rate = ((end_value / start_value) ** (1 / periods) - 1)
+            if growth_rate == nan:
+                return 0.0
             return round(growth_rate, 4)
-        except KeyError:
+        except:
             return 0.0
 
     def _get_dividends_to_eps_ratio(self):
@@ -132,8 +140,14 @@ class Stock:
         try:
             index = str(self.frames[0].columns[-1].year)
             payout_ratio = self.frames[0][index]['Payout Ratio % *'] / 100
-        except KeyError:
-            payout_ratio = nan
+
+            if payout_ratio > 0:
+                pass
+            else:
+                return 0.0
+
+        except:
+            payout_ratio = 0.0  # should be NaN
         return payout_ratio
 
     def _get_graham_number(self):
@@ -196,7 +210,7 @@ class Stock:
                       0.02 <= self.dividend_yield <= 0.08,
                       self.dividend_compound_annual_growth_rate >= 0.06,
                       self.price_to_earnings_ratio <= 16.0,
-                      self.dividend_payout_ratio <= 0.6,
+                      0.0 < self.dividend_payout_ratio <= 0.6,
                       self.debt_to_equity <= 0.6,
                       self.discount >= 0.1]
         for condition in conditions:

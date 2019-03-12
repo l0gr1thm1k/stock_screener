@@ -11,6 +11,81 @@ from bs4 import BeautifulSoup
 from datetime import date
 
 
+class QuoteDownloader(object):
+
+    def __init__(self):
+        pass
+        url = "https://www.morningstar.com/stocks/xnys/{}/quote.html"
+        
+    def download(self, ticker, conn=None):
+        u"""Downloads and returns a dictionary containing pandas.DataFrames
+        representing the financials (i.e. income statement, balance sheet,
+        cash flow) for the given Morningstar ticker. If the MySQL connection
+        is specified then the downloaded financials are uploaded to the MySQL
+        database.
+        :param ticker: Morningstar ticker.
+        :param conn: MySQL connection.
+        :return Dictionary containing pandas.DataFrames representing the
+        financials for the given Morningstar ticker.
+        """
+        result = {}
+
+        ##########################
+        # Error Handling
+        ###http://financials.morningstar.com/ajax/exportFIN2CSV.html?&callback=?&t=XOM&region=US&culture=en_US&cur=USD#######################
+
+        # Empty String
+        if len(ticker) == 0:
+            raise ValueError("You did not enter a ticker symbol.  Please"
+                             " try again.")
+
+        for report_type, table_name in [
+            (u'is', u'income_statement'),
+            (u'bs', u'balance_sheet'),
+            (u'cf', u'cash_flow')]:
+            frame = self._download(ticker, report_type)
+            result[table_name] = frame
+            if conn:
+                self._upload_frame(
+                    frame, ticker, self._table_prefix + table_name, conn)
+        if conn:
+            self._upload_unit(ticker, self._table_prefix + u'unit', conn)
+        result[u'period_range'] = self._period_range
+        result[u'fiscal_year_end'] = self._fiscal_year_end
+        result[u'currency'] = self._currency
+        return result
+
+    def _download(self, ticker, report_type):
+        u"""Downloads and returns a pandas.DataFrame corresponding to the
+        given Morningstar ticker and the given type of the report.
+        :param ticker: Morningstar ticker.
+        :param report_type: Type of the report ('is', 'bs', 'cf').
+        :return  pandas.DataFrame corresponding to the given Morningstar ticker
+        and the given type of the report.
+        """
+        url = (r'http://financials.morningstar.com/ajax/' +
+               r'ReportProcess4HtmlAjax.html?&t=' + ticker +
+               r'&region=usa&culture=en-US&cur=USD' +
+               r'&reportType=' + report_type + r'&period=12' +
+               r'&dataType=A&order=asc&columnYear=5&rounding=3&view=raw')
+        with urllib.request.urlopen(url) as response:
+            json_text = response.read().decode(u'utf-8')
+
+            ##############################
+            # Error Handling
+            ##############################
+
+            # Wrong ticker
+            if len(json_text) == 0:
+                raise ValueError("MorningStar cannot find the ticker symbol "
+                                 "you entered or it is INVALID. Please try "
+                                 "again.")
+
+            json_data = json.loads(json_text)
+            result_soup = BeautifulSoup(json_data[u'result'], u'html.parser')
+            return self._parse(result_soup)
+
+
 class KeyRatiosDownloader(object):
     u"""Downloads key ratios from http://financials.morningstar.com/
     """
@@ -276,7 +351,8 @@ class FinancialsDownloader(object):
 
         ##########################
         # Error Handling
-        ##########################
+        ###http://financials.morningstar.com/ajax/exportFIN2CSV.html?&callback=?&t=XOM&region=US&culture=en_US&cur=USD#######################
+        # http://financials.morningstar.com/ajax/exportKR2CSV.html?&callback=?&t=MORN&region=US&culture=en_US&cur=USD
 
         # Empty String
         if len(ticker) == 0:

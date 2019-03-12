@@ -66,7 +66,7 @@ def before_request():
                         **query_parameters)
 
     if LOG_REQUESTS:
-        logger.debug('Clustering request', clusteringRequest=str(request_data))
+        logger.debug('Screening request', screeningRequest=str(request_data))
 
     request.start_time = datetime.now()
 
@@ -88,7 +88,7 @@ def after_request(response):
         response_data = {}
 
     if LOG_RESPONSES:
-        logger.debug('Screening response', statusCode=response.status_code, clusteringResponse=str(response_data))
+        logger.debug('Screening response', statusCode=response.status_code, screeningResponse=str(response_data))
 
     return response
 
@@ -107,7 +107,7 @@ def internal_server_error(ex):
         return ex
     else:
         log_exception(ex)
-        return Response(json.dumps({'message': f'Unhandled exception in Clustering application: {ex}'},
+        return Response(json.dumps({'message': f'Unhandled exception in Screening application: {ex}'},
                                    ensure_ascii=False, sort_keys=True), status=500, mimetype='application/json')
 
 
