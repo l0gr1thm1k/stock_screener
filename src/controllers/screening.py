@@ -16,7 +16,8 @@ def post_screen(ticker):  # noqa: E501
     company_ticker = ticker['ticker'].upper()
 
     stock = Stock(company_ticker)
-    curated_results = {"companyName": stock.name,
+    curated_results = {"companyDescription": stock.description,
+                       "companyName": stock.name,
                        "companyTicker": stock.ticker,
                        "debtToEquityRatio": stock.debt_to_equity,
                        "dividendCAGR": stock.dividend_compound_annual_growth_rate,

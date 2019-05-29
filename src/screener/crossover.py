@@ -40,4 +40,4 @@ def crossover_point(desired_monthly_income, monthly_deposit, formatting):
     
 if __name__ == '__main__':
     import sys
-    crossover_point(60000, 7000, 'psql')
+    crossover_point(10000, 2000, 'psql')

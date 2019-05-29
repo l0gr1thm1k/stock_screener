@@ -35,9 +35,8 @@ class Stock:
         self.dividend_payout_ratio = self._get_company_numeric_attribute('divpayoutratio')
         self.price_to_earnings_ratio = self._get_company_numeric_attribute('pricetoearnings')
         self.debt_to_equity = self._get_company_numeric_attribute('debttoequity')
-        self.description = self._get_company_text_attribute('short_description')
         self.annualized_dividends = self._get_annualized_dividends()
-        self.name = self._get_company_text_attribute('name')
+        self.name = self._get_name()
         self.price = self._get_price()
         self.continuous_dividend_increases = self._continuous_dividend_increases()
         self.dividend_compound_annual_growth_rate = self._get_dividend_compound_annual_growth_rate(self.periods)
@@ -45,8 +44,8 @@ class Stock:
         self.discount = self._get_discount_rate()
         self.star_rating = self._get_star_rating()
         
-    def _get_company_text_attribute(self, tag):
-        return self.company_api.get_company_data_point_text(self.ticker, tag)
+    def _get_name(self):
+        return self.company_api.get_company_data_point_text(self.ticker, 'name')
 
     def _get_price(self):
         return self.security_api.get_security_realtime_price(self.ticker).last_price
@@ -70,10 +69,6 @@ class Stock:
         """
         basic_earnings_per_share = self._get_company_numeric_attribute('basiceps')
         book_value_per_share = self._get_company_numeric_attribute('bookvaluepershare')
-        
-        # basic_earnings_per_share = self._get_company_numeric_attribute('dilutedeps')
-        # book_value_per_share = self._get_company_numeric_attribute('tangbookvaluepershare')
-
         return round(sqrt(24 * basic_earnings_per_share * book_value_per_share), 2)
  
     def _continuous_dividend_increases(self):
@@ -113,7 +108,7 @@ class Stock:
         end_value = self.annualized_dividends[-1]
         growth_rate = ((end_value / start_value) ** (1 / periods) - 1)
         
-        return round(growth_rate / 10, 4)
+        return round(growth_rate, 4)
 
     def _get_discount_rate(self):
         """
