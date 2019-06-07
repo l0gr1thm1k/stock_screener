@@ -26,7 +26,7 @@ def post_screen(ticker):  # noqa: E501
                        "dividendYield": stock.dividend_yield,
                        "priceToEarningsRatio": stock.price_to_earnings_ratio,
                        "starRating": stock.star_rating,
-                       "stockDiscount": stock.discount,
                        "stockFairValue": stock.graham_number,
+                       "stockFairValueDiscount": stock.fair_value,
                        "stockPrice": stock.price}
     return curated_results

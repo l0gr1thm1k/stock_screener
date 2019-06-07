@@ -4,15 +4,15 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from numpy import nan, sqrt
 
-API_KEY = 'OjliMWY5NzAwNDFiNjM5MzU2OWJiODlmODg0MTAyMDM2'
-# API_KEY = 'OjQxMjczNjRjYWRiMTIyZmFkZDYyNGFmNTY1Nzg1NmJl'
+API_KEY = 'OjliMWY5NzAwNDFiNjM5MzU2OWJiODlmODg0MTAyMDM2'  # SANDBOX KEY
+API_KEY = 'OjQxMjczNjRjYWRiMTIyZmFkZDYyNGFmNTY1Nzg1NmJl'  # PRODUCTION KEY
+
 
 class Stock:
 
     intrinio_sdk.ApiClient().configuration.api_key['api_key'] = API_KEY
     security_api = intrinio_sdk.SecurityApi()
     company_api = intrinio_sdk.CompanyApi()
-
 
     def __init__(self, ticker, industry=None, periods=5):
 
@@ -42,8 +42,8 @@ class Stock:
         self.continuous_dividend_increases = self._continuous_dividend_increases()
         self.dividend_compound_annual_growth_rate = self._get_dividend_compound_annual_growth_rate(self.periods)
         self.graham_number = self._get_graham_number()
-        self.discount = self._get_discount_rate()
-        self.star_rating = self._get_star_rating()
+        self.fair_value = self._get_fair_value_discount()
+        self.star_rating, self.quantitative_rating = self._get_star_rating()
         
     def _get_company_text_attribute(self, tag):
         return self.company_api.get_company_data_point_text(self.ticker, tag)
@@ -70,16 +70,13 @@ class Stock:
         """
         basic_earnings_per_share = self._get_company_numeric_attribute('basiceps')
         book_value_per_share = self._get_company_numeric_attribute('bookvaluepershare')
-        
-        # basic_earnings_per_share = self._get_company_numeric_attribute('dilutedeps')
-        # book_value_per_share = self._get_company_numeric_attribute('tangbookvaluepershare')
 
         return round(sqrt(24 * basic_earnings_per_share * book_value_per_share), 2)
  
     def _continuous_dividend_increases(self):
         past_dividend = 0.0
         for dividend_payment in self.annualized_dividends:
-            if dividend_payment < past_dividend:
+            if dividend_payment <= past_dividend:
                 return False
             past_dividend = dividend_payment
             
@@ -88,7 +85,10 @@ class Stock:
     def _get_annualized_dividends(self):
         historical_dividend_data = self.company_api.get_company_historical_data(self.ticker, 'dividend', start_date=self.start_date,
                                                                                 end_date=self.end_date, sort_order='asc').historical_data
-        current_year = historical_dividend_data[0].date.year
+        try:
+            current_year = historical_dividend_data[0].date.year
+        except IndexError:
+            return [0 for ii in range(self.periods)]
         dividends = []
         dividend_payed = 0
         for element in historical_dividend_data:
@@ -115,22 +115,16 @@ class Stock:
         
         return round(growth_rate / 10, 4)
 
-    def _get_discount_rate(self):
+    def _get_fair_value_discount(self):
         """
 
         :return float: a percentage of discount rate. positive means there exists a discount, negative mean the
         equity is overpriced.
         """
-        if self.graham_number > self.price:
-            # if underpriced
-            difference = self.graham_number - self.price
-            discount = round((difference / self.graham_number), 4)
-            return discount
+        if self.graham_number > 0.0:  # is np.nan
+            return round(self.price / self.graham_number, 2)
         else:
-            # if overpriced
-            difference = self.price - self.graham_number
-            discount = -round((difference / self.price), 4)
-        return discount
+            return 1
 
     def _get_star_rating(self):
         """
@@ -140,29 +134,22 @@ class Stock:
         star = "\N{BLACK STAR}"
         empty_star = "\N{WHITE STAR}"
         rating = ""
+        int_rating = 0
         conditions = [self.continuous_dividend_increases is True,
                       0.02 <= self.dividend_yield <= 0.08,
                       self.dividend_compound_annual_growth_rate >= 0.06,
                       self.price_to_earnings_ratio <= 16.0,
                       0.0 < self.dividend_payout_ratio <= 0.6,
                       self.debt_to_equity <= 0.6,
-                      self.discount >= 0.1]
+                      self.fair_value <= 0.9]
         for condition in conditions:
             if condition is not nan and condition:
                 rating = rating + star
+                int_rating += 1
         num_empty_stars = 7 - len(rating)
         empty_stars = empty_star * num_empty_stars
         rating = rating + empty_stars
-        return rating
-
-
-def format_company_name(name):
-    if "(The)" in name:
-        name = re.sub("\s*\(The\).+", "", name)
-        name = "The " + name
-    if "Commo" in name:
-        name = re.sub("\s*Commo.+", "", name)
-    return name
+        return rating, int_rating
 
 
 def print_msg(text: str, newline: bool = False) -> None:
@@ -186,7 +173,7 @@ def print_summary(stock):
             "    {} consecutive years of dividend increases: {}".format(stock.periods, str(stock.continuous_dividend_increases)),
             "    Dividend yield is at least 2% but less than 8%: {:.2f}%".format(stock.dividend_yield * 100),
             "    Median of dividend {}-year compound annual growth is at least 6%: {:.2f}%".format(stock.periods,
-                                                                                                   stock.dividend_compound_annual_growth_rate * 10),
+                                                                                                   stock.dividend_compound_annual_growth_rate * 100),
             "    Ratio of dividends to earnings per share is less than 60%: {:.2f}%".format(stock.dividend_payout_ratio * 100),
             " ",
             "    Price to Earnings ratio is less than 16: {:.2f}".format(stock.price_to_earnings_ratio),
@@ -194,23 +181,20 @@ def print_summary(stock):
             " ",
             "    Stock's fair value: ${:.2f}".format(stock.graham_number),
             "    Stock's price: ${:.2f}".format(stock.price),
-            "    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.discount * 100),
+            "    Price discount is at least 10% of fair value estimate: {:.2f}%".format(stock.fair_value * 100),
             " ",
             "    Star Rating: {}".format(stock.star_rating),
             " "]
     if stock.industry is not None:
         msgs.insert(3, "    Sector: {}".format(stock.industry))
         msgs.insert(4, " ")
-        
-    print("%" * 120)
-    for msg in msgs:
-        print_msg(msg)
-    
-    print("%" * 120)
+    end_line = "%" * 120 + "\n"
+    return end_line + "".join(["% {: <117}%\n".format(msg) for msg in msgs]) + end_line
 
 
 if __name__ == '__main__':
     import sys
     ticker = sys.argv[1]
     stock = Stock(ticker)
-    print_summary(stock)
+    report = print_summary(stock)
+    print(report)
