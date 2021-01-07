@@ -3,7 +3,7 @@ connexion[swagger-ui]==2.1.0
 flask==1.0.2
 gunicorn==19.9.0
 intrinio_sdk==3.0.0
-lxml==4.2.4
+lxml==4.6.2
 numpy==1.15.1
 pandas==0.23.4
 prometheus_client==0.3.1
